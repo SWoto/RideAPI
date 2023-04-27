@@ -18,7 +18,7 @@ def create_app(db_url=None):
     # All loading stuffs and configuration
     app.config["PROPAGATE_EXCEPTION"] = os.getenv(
         "FLASK_PROPAGATE_EXCEPTION", False)
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
+    app.config["SQLALCHEMY_DATABASE_URI"] = db_url if db_url else os.getenv(
         "DATABASE_URL", "sqlite///data.db")
 
     app.config["API_TITLE"] = "{} - {}".format(
