@@ -1,7 +1,7 @@
 from passlib.hash import pbkdf2_sha256
 
 
-from tests.integration.integration_base_test import BaseTest
+from tests.base_test import BaseTest
 from models.user import UserModel
 from db import db
 

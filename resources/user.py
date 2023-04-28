@@ -26,4 +26,4 @@ class UserRegister(MethodView):
         db.session.add(user)
         db.session.commit()
 
-        return {"message": "user created succefully."}, 201
+        return {"message": "User created succefully."}, 201

@@ -14,16 +14,21 @@ from db import db
 class BaseTest(unittest.TestCase):
     SQLALCHEMY_DATABASE_URI = "sqlite:///"
 
+    @classmethod
+    def setUpClass(cls):
+        cls._app = create_app(BaseTest.SQLALCHEMY_DATABASE_URI)
+
+    @classmethod
+    def tearDownClass(cls):
+        pass
+
     def setUp(self):
-        self._app = create_app(BaseTest.SQLALCHEMY_DATABASE_URI)
         with self._app.app_context():
             db.create_all()
-        self.app = self._app.test_client()
+        self.app = self._app.test_client
         self.app_context = self._app.app_context
 
     def tearDown(self):
         with self._app.app_context():
             db.session.remove()
             db.drop_all()
-        self.app = None
-        self._app = None
