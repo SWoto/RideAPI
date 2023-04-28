@@ -18,14 +18,12 @@ class UserTest(BaseTest):
             self.assertIsNone(UserModel.query.filter(UserModel.email == 'test@restapi.com').first(),
                               "Found an user with email 'test@restapi.com' before save_to_db")
 
-            db.session.add(user)
-            db.session.commit()
+            user.save_to_db()
 
             self.assertIsNotNone(UserModel.query.filter(UserModel.email == 'test@restapi.com').first(),
                                  "Did not find an user with email 'test@restapi.com' after save_to_db")
 
-            db.session.delete(user)
-            db.session.commit()
+            user.delete_from_db()
 
             self.assertIsNone(UserModel.query.filter(UserModel.email == 'test@restapi.com').first(),
                               "Found an user with email 'test@restapi.com' after delete_from_db")

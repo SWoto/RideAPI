@@ -1,4 +1,5 @@
 from passlib.hash import pbkdf2_sha256
+import uuid
 
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
@@ -14,16 +15,37 @@ blp = Blueprint("Users", "users",
 @blp.route("/register")
 class UserRegister(MethodView):
     @blp.arguments(UserSchema)
+    @blp.response(201, UserSchema)
     def post(self, user_data):
         if UserModel.query.filter(UserModel.email == user_data["email"]).first():
             abort(409, message="An user with that email already exists.")
 
-        user = UserModel(username=user_data['username'],
+        user = UserModel(id=uuid.uuid4().hex,
+                         username=user_data['username'],
                          email=user_data['email'],
                          password=pbkdf2_sha256.hash(user_data['password']),
                          role=user_data['role'])
 
-        db.session.add(user)
-        db.session.commit()
+        user.save_to_db()
 
-        return {"message": "User created succefully."}, 201
+        #return {"message": "User created succefully."}, 201
+        return user
+
+
+@blp.route('/user/<string:user_id>')
+class User(MethodView):
+    @blp.response(200, UserSchema)
+    def get(self, user_id):
+        user = UserModel.find_by_id(user_id)
+        if not user:
+            abort(404, message='There is no user with requested id')
+
+        return user
+
+    def delete(self, user_id):
+        user = UserModel.find_by_id(user_id)
+        if not user:
+            abort(404, message='There is no user with requested id')
+
+        user.delete_from_db()
+        return {"message": "User deleted"}, 200
