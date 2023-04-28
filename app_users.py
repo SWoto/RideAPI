@@ -23,11 +23,11 @@ def create_app(db_url=None):
 
     app.config["API_TITLE"] = "{} - {}".format(
         os.getenv("API_TITLE", ""), API_NAME)
-    app.config["API_VERSION"] = os.getenv("API_VERSION")
-    app.config["OPENAPI_VERSION"] = os.getenv("OPENAPI_VERSION")
+    app.config["API_VERSION"] = "v1"
+    app.config["OPENAPI_VERSION"] = "3.0.3"
     app.config["OPENAPI_URL_PREFIX"] = "/"
-    app.config["OPENAPI_SWAGGER_UI_PATH"] = os.getenv("OPENAPI_SWAGGER_UI_PATH", "")
-    app.config["OPENAPI_SWAGGER_UI_URL"] = os.getenv("OPENAPI_SWAGGER_UI_URL")
+    app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
+    app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
 
     db.init_app(app)
     api = Api(app)
