@@ -1,5 +1,5 @@
 from passlib.hash import pbkdf2_sha256
-
+import uuid
 
 from tests.base_test import BaseTest
 from models.user import UserModel
@@ -10,7 +10,8 @@ class UserTest(BaseTest):
     def test_crud(self):
         with self.app_context():
             _password = pbkdf2_sha256.hash('test_secure')
-            user = UserModel(username='test_user',
+            user = UserModel(id=uuid.uuid4().hex,
+                             username='test_user',
                              email='test@restapi.com',
                              password=_password,
                              role=0)
