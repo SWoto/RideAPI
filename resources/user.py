@@ -3,6 +3,7 @@ import uuid
 
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
+from flask_jwt_extended import create_access_token
 
 from db import db
 from models import UserModel
@@ -30,6 +31,21 @@ class UserRegister(MethodView):
 
         #return {"message": "User created succefully."}, 201
         return user
+
+
+@blp.route('/login')
+class UserLogin(MethodView):
+    @blp.arguments(UserSchema)
+    def post(self, user_data):
+        
+
+
+@blp.route('/logout')
+class UserLogout(MethodView):
+    @blp.arguments(UserSchema)
+    def post(self):
+        pass
+
 
 
 @blp.route('/user/<string:user_id>')
