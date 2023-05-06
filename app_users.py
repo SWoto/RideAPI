@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 
 from flask import Flask
+from flask_jwt_extended import JWTManager
 from flask_smorest import Api
 
 
@@ -27,10 +28,14 @@ def create_app(db_url=None):
     app.config["OPENAPI_URL_PREFIX"] = "/"
     app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
     app.config["OPENAPI_SWAGGER_UI_URL"] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
-    #app.config["DEBUG"] = True
+    app.config["DEBUG"] = True
 
     db.init_app(app)
     api = Api(app)
+
+    app.config['JWT_SECRET_KEY'] = os.getenv(
+        "JWT_SECRET_KEY", False)
+    jwt = JWTManager(app)
 
     api.register_blueprint(UserBlueprint)
 

@@ -37,7 +37,12 @@ class UserRegister(MethodView):
 class UserLogin(MethodView):
     @blp.arguments(UserSchema)
     def post(self, user_data):
+        user = UserModel.find_by_email(user_data['email'])
+        if user and pbkdf2_sha256.verify(user_data['password'], user.password):
+            access_token = create_access_token(identity=user.id, fresh=True)
+            return {'access_token':access_token}
         
+        abort(401, message='Invalid credentials.')
 
 
 @blp.route('/logout')

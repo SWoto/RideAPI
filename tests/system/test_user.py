@@ -8,10 +8,12 @@ from db import db
 
 class UserTest(BaseTest):
     def test_register_user(self):
-        data_in = {'username': 'test_user',
-                   'email': 'test@restapi.com',
-                   'password': 'test_secure',
-                   'role': 0}
+        data_in = {
+            'username': 'test_user',
+            'email': 'test@restapi.com',
+            'password': 'test_secure',
+            'role': 0,
+        }
 
         with self.app() as client:
             with self.app_context():
@@ -35,20 +37,23 @@ class UserTest(BaseTest):
                     "An user with that email already exists.", json.loads(request.data)['message'])
 
     def test_get_user(self):
-        data_in = {'username': 'test_user',
-                   'email': 'test@restapi.com',
-                   'password': 'test_secure',
-                   'role': 0}
-        
+        data_in = {
+            'username': 'test_user',
+            'email': 'test@restapi.com',
+            'password': 'test_secure',
+            'role': 0,
+        }
+
         data_expected = data_in.copy()
         data_expected.pop('password')
 
         with self.app() as client:
             with self.app_context():
-                #test without registering
+                # test without registering
                 request = client.get('/user/{}'.format(uuid.uuid4().hex))
                 self.assertEqual(request.status_code, 404)
-                self.assertEqual(json.loads(request.data)['message'], "There is no user with requested id")
+                self.assertEqual(json.loads(request.data)[
+                                 'message'], "There is no user with requested id")
 
                 # request to test again
                 request = client.post('/register', json=data_in)
@@ -57,24 +62,29 @@ class UserTest(BaseTest):
                 request = client.get('/user/{}'.format(id))
 
                 data_expected['id'] = id
-                self.assertEqual(request.status_code, 200, "Could not receive user information")
-                self.assertDictEqual(json.loads(request.data), data_expected, "User received data does not meet standart")
+                self.assertEqual(request.status_code, 200,
+                                 "Could not receive user information")
+                self.assertDictEqual(json.loads(
+                    request.data), data_expected, "User received data does not meet standart")
 
     def test_delete_user(self):
-        data_in = {'username': 'test_user',
+        data_in = {
+            'username': 'test_user',
             'email': 'test@restapi.com',
             'password': 'test_secure',
-            'role': 0}
-        
+            'role': 0,
+        }
+
         data_expected = data_in.copy()
         data_expected.pop('password')
 
         with self.app() as client:
             with self.app_context():
-                #test without registering
+                # test without registering
                 request = client.delete('/user/{}'.format(uuid.uuid4().hex))
                 self.assertEqual(request.status_code, 404)
-                self.assertEqual(json.loads(request.data)['message'], "There is no user with requested id")
+                self.assertEqual(json.loads(request.data)[
+                                 'message'], "There is no user with requested id")
 
                 request = client.post('/register', json=data_in)
 
@@ -82,6 +92,38 @@ class UserTest(BaseTest):
                 request = client.delete('/user/{}'.format(id))
 
                 data_expected['id'] = id
-                self.assertEqual(request.status_code, 200, "Could not delete user")
-                self.assertEqual(json.loads(request.data)['message'], "User deleted")
+                self.assertEqual(request.status_code, 200,
+                                 "Could not delete user")
+                self.assertEqual(json.loads(request.data)[
+                                 'message'], "User deleted")
 
+    def test_register_and_login(self):
+        data_in_register = {
+            'username': 'test_user',
+            'email': 'test@restapi.com',
+            'password': 'test_secure',
+            'role': 0,
+        }
+
+        data_in_login_ok = {
+            'email': 'test@restapi.com',
+            'password': 'test_secure',
+        }
+
+        data_in_login_bad = {
+            'email': 'test@restapi.com',
+            'password': 'abcdegh',
+        }
+
+        with self.app() as client:
+            with self.app_context():
+                # test without registering
+                client.post('/register', json=data_in_register)
+
+                request = client.post('/login', json=data_in_login_ok)
+                self.assertIn('access_token', json.loads(request.data).keys())
+
+                request = client.post('/login', json=data_in_login_bad)
+                self.assertEqual(request.status_code, 401)
+                self.assertEqual(json.loads(request.data)[
+                                 'message'], "Invalid credentials.")
