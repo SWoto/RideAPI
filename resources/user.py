@@ -1,13 +1,16 @@
 from passlib.hash import pbkdf2_sha256
 import uuid
+from datetime import timedelta
+import os
 
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, get_jwt, jwt_required
 
 from db import db
 from models import UserModel
 from schemas import UserSchema
+from blocklist import jwt_redis_blocklist
 
 blp = Blueprint("Users", "users",
                 description="Operation on users, be they drivers or passagens.")
@@ -47,10 +50,13 @@ class UserLogin(MethodView):
 
 @blp.route('/logout')
 class UserLogout(MethodView):
-    @blp.arguments(UserSchema)
-    def post(self):
-        pass
-
+    @jwt_required()
+    def delete(self):
+        access_expires =  timedelta(hours=int(os.getenv(
+        "ACCESS_EXPIRES_HOURS", 1)))
+        jti = get_jwt()['jti']  
+        jwt_redis_blocklist.set(jti, "", ex=access_expires)
+        return {'message':'Successfully logged out.'}
 
 
 @blp.route('/user/<string:user_id>')

@@ -30,11 +30,32 @@ class UserTest(BaseTest):
 
                 self.assertDictEqual(data_in_wo_password, received)
 
+
+    def test_register_duplicated_user(self):
+        data_in = {
+            'username': 'test_user',
+            'email': 'test@restapi.com',
+            'password': 'test_secure',
+            'role': 0,
+        }
+
+        with self.app() as client:
+            with self.app_context():
+                request = client.post('/register', json=data_in)
+
+                received = json.loads(request.data)
+                received.pop('id')
+                data_in_wo_password = data_in.copy()
+                data_in_wo_password.pop('password')
+
+                self.assertDictEqual(data_in_wo_password, received)
+
                 request = client.post('/register', json=data_in)
 
                 self.assertEqual(request.status_code, 409)
                 self.assertEqual(
                     "An user with that email already exists.", json.loads(request.data)['message'])
+    
 
     def test_get_user(self):
         data_in = {
@@ -122,8 +143,83 @@ class UserTest(BaseTest):
 
                 request = client.post('/login', json=data_in_login_ok)
                 self.assertIn('access_token', json.loads(request.data).keys())
+                
+
+    def test_login_failed(self):
+        data_in_register = {
+            'username': 'test_user',
+            'email': 'test@restapi.com',
+            'password': 'test_secure',
+            'role': 0,
+        }
+
+        data_in_login_bad = {
+            'email': 'test@restapi.com',
+            'password': 'abcdegh',
+        }
+
+        with self.app() as client:
+            with self.app_context():
+                # test without registering
+                client.post('/register', json=data_in_register)
 
                 request = client.post('/login', json=data_in_login_bad)
                 self.assertEqual(request.status_code, 401)
                 self.assertEqual(json.loads(request.data)[
                                  'message'], "Invalid credentials.")
+
+
+    def test_login_logout(self):
+        data_in_register = {
+            'username': 'test_user',
+            'email': 'test@restapi.com',
+            'password': 'test_secure',
+            'role': 0,
+        }
+
+        data_in_login = {
+            'email': 'test@restapi.com',
+            'password': 'test_secure',
+        }
+
+        with self.app() as client:
+            with self.app_context():
+                # test without registering
+                client.post('/register', json=data_in_register)
+
+                request = client.post('/login', json=data_in_login)
+                jwt = json.loads(request.data)['access_token']
+
+                request = client.delete('/logout', headers={'Authorization': 'Bearer {}'.format(jwt)})
+                self.assertEqual(json.loads(request.data)[
+                                 'message'], "Successfully logged out.")
+
+
+    def test_duplicated_logout(self):
+        data_in_register = {
+            'username': 'test_user',
+            'email': 'test@restapi.com',
+            'password': 'test_secure',
+            'role': 0,
+        }
+
+        data_in_login = {
+            'email': 'test@restapi.com',
+            'password': 'test_secure',
+        }
+
+        with self.app() as client:
+            with self.app_context():
+                # test without registering
+                client.post('/register', json=data_in_register)
+
+                request = client.post('/login', json=data_in_login)
+                jwt = json.loads(request.data)['access_token']
+
+                request = client.delete('/logout', headers={'Authorization': 'Bearer {}'.format(jwt)})
+                self.assertEqual(json.loads(request.data)[
+                                 'message'], "Successfully logged out.")
+
+                request = client.delete('/logout', headers={'Authorization': 'Bearer {}'.format(jwt)})
+                self.assertEqual(json.loads(request.data)[
+                                 'msg'], "Token has been revoked")

@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 from flask import Flask
 from flask_jwt_extended import JWTManager
@@ -7,9 +8,11 @@ from flask_smorest import Api
 
 
 from db import db
+from blocklist import jwt_redis_blocklist
 from resources.user import blp as UserBlueprint
 
 API_NAME = "Users MS."
+
 
 def create_app(db_url=None):
     app = Flask(__name__)
@@ -35,7 +38,16 @@ def create_app(db_url=None):
 
     app.config['JWT_SECRET_KEY'] = os.getenv(
         "JWT_SECRET_KEY", False)
+    app.config['ACCESS_EXPIRES'] = timedelta(hours=int(os.getenv(
+        "ACCESS_EXPIRES_HOURS", 1)))
     jwt = JWTManager(app)
+
+    # Callback function to check if a JWT exists in the redis blocklist
+    @jwt.token_in_blocklist_loader
+    def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
+        jti = jwt_payload["jti"]
+        token_in_redis = jwt_redis_blocklist.get(jti)
+        return token_in_redis is not None
 
     api.register_blueprint(UserBlueprint)
 

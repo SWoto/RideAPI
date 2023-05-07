@@ -6,3 +6,4 @@ passlib
 marshmallow
 python-dotenv
 gunicorn
+redis
