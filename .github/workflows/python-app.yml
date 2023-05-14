@@ -14,23 +14,17 @@ permissions:
 
 jobs:
   container-job:
-    # Containers must run in Linux based operating systems
     runs-on: ubuntu-latest
-    # Docker Hub image that `container-job` executes in
-    container: node:10.18-jessie
-
-    # Service containers to run with `container-job`
     services:
-      # Label used to access the service container
       redis:
-        # Docker Hub image
         image: redis:7.0-alpine
-        # Set health checks to wait until redis has started
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+        ports:
+          - 6379:6379
+    steps:
+      - name: Connect to Redis
+        run: |
+          sudo apt-get install redis-tools
+          redis-cli ping
           
   build:
     needs: [container-job]
