@@ -1,22 +1,20 @@
 import os
-from dotenv import load_dotenv
-
-from flask import Flask
 
 from db import db
+from app import create_app
+from resources.vehicle import blp as VehicleBlueprint
 
-def create_app(db_url=None):
-    app = Flask(__name__)
-    load_dotenv()
 
-    #All loading stuffs and configuration
-    app.config["PROPAGATE_EXCEPTION"] = os.getenv("FLASK_PROPAGATE_EXCEPTION", False)
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite///data.db")
+API_NAME = "Vehicles MS."
 
-    db.init_app(app)
-
-    return app
 
 if __name__ == "__main__":
-    app = create_app()
+    app = create_app(API_NAME, blueprints=[VehicleBlueprint])
+
+    if app.config['DEBUG']:
+        with app.app_context():
+            @app.before_first_request
+            def create_tables():
+                db.create_all()
+
     app.run(host="0.0.0.0", port=os.getenv("VEHICLES_API_PORT"))
