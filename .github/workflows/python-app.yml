@@ -16,6 +16,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
     - uses: actions/checkout@v3
@@ -35,5 +36,7 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with unicode
+      env:
+        JWT_SECRET_KEY: ${{ secrets.FLASK_JWT_SECRET }}
       run: |
         python -m unittest discover -v -s tests -p "test_*.py"
