@@ -1,5 +1,6 @@
 from db import db
 
+
 class UserModel(db.Model):
     __tablename__ = "users"
 
@@ -9,6 +10,7 @@ class UserModel(db.Model):
     email = db.Column(db.String(254), unique=True, nullable=False)
     password = db.Column(db.String(256), nullable=False)
     role = db.Column(db.Integer, nullable=False)
+    vehicles = db.relationship("VehicleModel", back_populates="user", lazy="dynamic")
 
     @classmethod
     def find_by_id(cls, id):

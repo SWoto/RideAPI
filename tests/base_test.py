@@ -8,7 +8,7 @@ and makes sure that it is a new, blank database each time.
 
 import unittest
 
-from app_users import create_app
+from app_users import create_app, API_NAME, BLUEPRINTS
 from db import db
 
 class BaseTest(unittest.TestCase):
@@ -16,7 +16,7 @@ class BaseTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls._app = create_app(BaseTest.SQLALCHEMY_DATABASE_URI)
+        cls._app = create_app(API_NAME, blueprints=BLUEPRINTS, db_url=BaseTest.SQLALCHEMY_DATABASE_URI)
 
     @classmethod
     def tearDownClass(cls):

@@ -7,13 +7,22 @@ from db import db
 
 
 class UserTest(BaseTest):
+    default_data_in = {
+        'username': 'test_user',
+        'email': 'test@restapi.com',
+        'password': 'test_secure',
+        'role': 0
+    }
+
+    default_data_out = {
+        'username': 'test_user',
+        'email': 'test@restapi.com',
+        'role': 0,
+        'vehicles': []
+    }
+
     def test_register_user(self):
-        data_in = {
-            'username': 'test_user',
-            'email': 'test@restapi.com',
-            'password': 'test_secure',
-            'role': 0,
-        }
+        data_in = UserTest.default_data_in.copy()
 
         with self.app() as client:
             with self.app_context():
@@ -25,19 +34,11 @@ class UserTest(BaseTest):
 
                 received = json.loads(request.data)
                 received.pop('id')
-                data_in_wo_password = data_in.copy()
-                data_in_wo_password.pop('password')
 
-                self.assertDictEqual(data_in_wo_password, received)
-
+                self.assertDictEqual(UserTest.default_data_out, received)
 
     def test_register_duplicated_user(self):
-        data_in = {
-            'username': 'test_user',
-            'email': 'test@restapi.com',
-            'password': 'test_secure',
-            'role': 0,
-        }
+        data_in = UserTest.default_data_in.copy()
 
         with self.app() as client:
             with self.app_context():
@@ -45,28 +46,19 @@ class UserTest(BaseTest):
 
                 received = json.loads(request.data)
                 received.pop('id')
-                data_in_wo_password = data_in.copy()
-                data_in_wo_password.pop('password')
 
-                self.assertDictEqual(data_in_wo_password, received)
+                self.assertDictEqual(UserTest.default_data_out, received)
 
                 request = client.post('/register', json=data_in)
 
                 self.assertEqual(request.status_code, 409)
                 self.assertEqual(
                     "An user with that email already exists.", json.loads(request.data)['message'])
-    
 
     def test_get_user(self):
-        data_in = {
-            'username': 'test_user',
-            'email': 'test@restapi.com',
-            'password': 'test_secure',
-            'role': 0,
-        }
+        data_in = UserTest.default_data_in.copy()
 
-        data_expected = data_in.copy()
-        data_expected.pop('password')
+        data_expected = UserTest.default_data_out.copy()
 
         with self.app() as client:
             with self.app_context():
@@ -89,15 +81,9 @@ class UserTest(BaseTest):
                     request.data), data_expected, "User received data does not meet standart")
 
     def test_delete_user(self):
-        data_in = {
-            'username': 'test_user',
-            'email': 'test@restapi.com',
-            'password': 'test_secure',
-            'role': 0,
-        }
+        data_in = UserTest.default_data_in.copy()
 
-        data_expected = data_in.copy()
-        data_expected.pop('password')
+        data_expected = UserTest.default_data_out.copy()
 
         with self.app() as client:
             with self.app_context():
@@ -119,21 +105,11 @@ class UserTest(BaseTest):
                                  'message'], "User deleted")
 
     def test_register_and_login(self):
-        data_in_register = {
-            'username': 'test_user',
-            'email': 'test@restapi.com',
-            'password': 'test_secure',
-            'role': 0,
-        }
+        data_in_register = UserTest.default_data_in.copy()
 
         data_in_login_ok = {
             'email': 'test@restapi.com',
             'password': 'test_secure',
-        }
-
-        data_in_login_bad = {
-            'email': 'test@restapi.com',
-            'password': 'abcdegh',
         }
 
         with self.app() as client:
@@ -143,19 +119,13 @@ class UserTest(BaseTest):
 
                 request = client.post('/login', json=data_in_login_ok)
                 self.assertIn('access_token', json.loads(request.data).keys())
-                
 
     def test_login_failed(self):
-        data_in_register = {
-            'username': 'test_user',
-            'email': 'test@restapi.com',
-            'password': 'test_secure',
-            'role': 0,
-        }
+        data_in_register = UserTest.default_data_in.copy()
 
         data_in_login_bad = {
             'email': 'test@restapi.com',
-            'password': 'abcdegh',
+            'password': 'abcdefgh',
         }
 
         with self.app() as client:
@@ -168,14 +138,8 @@ class UserTest(BaseTest):
                 self.assertEqual(json.loads(request.data)[
                                  'message'], "Invalid credentials.")
 
-
     def test_login_logout(self):
-        data_in_register = {
-            'username': 'test_user',
-            'email': 'test@restapi.com',
-            'password': 'test_secure',
-            'role': 0,
-        }
+        data_in_register = UserTest.default_data_in.copy()
 
         data_in_login = {
             'email': 'test@restapi.com',
@@ -190,18 +154,13 @@ class UserTest(BaseTest):
                 request = client.post('/login', json=data_in_login)
                 jwt = json.loads(request.data)['access_token']
 
-                request = client.delete('/logout', headers={'Authorization': 'Bearer {}'.format(jwt)})
+                request = client.delete(
+                    '/logout', headers={'Authorization': 'Bearer {}'.format(jwt)})
                 self.assertEqual(json.loads(request.data)[
                                  'message'], "Successfully logged out.")
-
 
     def test_duplicated_logout(self):
-        data_in_register = {
-            'username': 'test_user',
-            'email': 'test@restapi.com',
-            'password': 'test_secure',
-            'role': 0,
-        }
+        data_in_register = UserTest.default_data_in.copy()
 
         data_in_login = {
             'email': 'test@restapi.com',
@@ -216,10 +175,12 @@ class UserTest(BaseTest):
                 request = client.post('/login', json=data_in_login)
                 jwt = json.loads(request.data)['access_token']
 
-                request = client.delete('/logout', headers={'Authorization': 'Bearer {}'.format(jwt)})
+                request = client.delete(
+                    '/logout', headers={'Authorization': 'Bearer {}'.format(jwt)})
                 self.assertEqual(json.loads(request.data)[
                                  'message'], "Successfully logged out.")
 
-                request = client.delete('/logout', headers={'Authorization': 'Bearer {}'.format(jwt)})
+                request = client.delete(
+                    '/logout', headers={'Authorization': 'Bearer {}'.format(jwt)})
                 self.assertEqual(json.loads(request.data)[
-                                 'msg'], "Token has been revoked")
+                                 'description'], "The token has been revoked.")
