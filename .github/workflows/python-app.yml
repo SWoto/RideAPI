@@ -30,9 +30,6 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: npm ci
-
       - name: Connect to Redis
         run: node client.js
         env:
@@ -41,6 +38,7 @@ jobs:
           REDIS_PORT: 6379
           
   build:
+    needs: [container-job]
     runs-on: ubuntu-latest
     environment: production
 
