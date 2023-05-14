@@ -66,7 +66,7 @@ class UserTest(BaseTest):
                 request = client.get('/user/{}'.format(uuid.uuid4().hex))
                 self.assertEqual(request.status_code, 404)
                 self.assertEqual(json.loads(request.data)[
-                                 'message'], "There is no user with requested id")
+                                 'status'], "Not Found")
 
                 # request to test again
                 request = client.post('/register', json=data_in)
@@ -91,7 +91,7 @@ class UserTest(BaseTest):
                 request = client.delete('/user/{}'.format(uuid.uuid4().hex))
                 self.assertEqual(request.status_code, 404)
                 self.assertEqual(json.loads(request.data)[
-                                 'message'], "There is no user with requested id")
+                                 'status'], "Not Found")
 
                 request = client.post('/register', json=data_in)
 
@@ -102,7 +102,7 @@ class UserTest(BaseTest):
                 self.assertEqual(request.status_code, 200,
                                  "Could not delete user")
                 self.assertEqual(json.loads(request.data)[
-                                 'message'], "User deleted")
+                                 'message'], "User deleted.")
 
     def test_register_and_login(self):
         data_in_register = UserTest.default_data_in.copy()

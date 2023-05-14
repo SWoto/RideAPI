@@ -21,12 +21,10 @@ class UserRegister(MethodView):
     @blp.arguments(UserSchema)
     @blp.response(201, UserSchema)
     def post(self, user_data):
-        if UserModel.query.filter(UserModel.email == user_data["email"]).first():
+        if UserModel.find_by_email(user_data['email']):
             abort(409, message="An user with that email already exists.")
 
-        user_data['password'] = pbkdf2_sha256.hash(user_data['password'])
-        user = UserModel(id=uuid.uuid4().hex,
-                         **user_data)
+        user = UserModel(**user_data)
 
         user.save_to_db()
 
@@ -61,19 +59,14 @@ class UserLogout(MethodView):
 class User(MethodView):
     @blp.response(200, UserSchema)
     def get(self, user_id):
-        user = UserModel.find_by_id(user_id)
-        if not user:
-            abort(404, message='There is no user with requested id')
-
+        user = UserModel.query.get_or_404(user_id)
         return user
 
     def delete(self, user_id):
-        user = UserModel.find_by_id(user_id)
-        if not user:
-            abort(404, message='There is no user with requested id')
-
+        user = UserModel.query.get_or_404(user_id)
         user.delete_from_db()
-        return {"message": "User deleted"}, 200
+        
+        return {"message": "User deleted."}, 200
 
 #TODO: Add test
 @blp.route('/user')
