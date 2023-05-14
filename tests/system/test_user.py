@@ -1,24 +1,24 @@
 import json
 import uuid
 
-from tests.base_test import BaseTest
+from tests.base_test import UserBaseTest
 from models.user import UserModel
 from db import db
 
 
-class UserTest(BaseTest):
+class UserTest(UserBaseTest):
     default_data_in = {
         'username': 'test_user',
         'email': 'test@restapi.com',
         'password': 'test_secure',
-        'role': 0
+        'role': 0,
     }
 
     default_data_out = {
         'username': 'test_user',
         'email': 'test@restapi.com',
         'role': 0,
-        'vehicles': []
+        'vehicles': [],
     }
 
     def test_register_user(self):
@@ -29,7 +29,7 @@ class UserTest(BaseTest):
                 request = client.post('/register', json=data_in)
 
                 self.assertEqual(request.status_code, 201)
-                self.assertIsNotNone(UserModel.query.filter(UserModel.email == 'test@restapi.com').first(),
+                self.assertIsNotNone(UserModel.find_by_email('test@restapi.com'),
                                      "Did not find an user with email 'test@restapi.com' after posting into endpoint")
 
                 received = json.loads(request.data)
