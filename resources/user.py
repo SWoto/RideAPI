@@ -24,11 +24,9 @@ class UserRegister(MethodView):
         if UserModel.query.filter(UserModel.email == user_data["email"]).first():
             abort(409, message="An user with that email already exists.")
 
+        user_data['password'] = pbkdf2_sha256.hash(user_data['password'])
         user = UserModel(id=uuid.uuid4().hex,
-                         username=user_data['username'],
-                         email=user_data['email'],
-                         password=pbkdf2_sha256.hash(user_data['password']),
-                         role=user_data['role'])
+                         **user_data)
 
         user.save_to_db()
 
@@ -76,3 +74,11 @@ class User(MethodView):
 
         user.delete_from_db()
         return {"message": "User deleted"}, 200
+
+#TODO: Add test
+@blp.route('/user')
+class UserList(MethodView):
+    @jwt_required()
+    @blp.response(200, UserSchema(many=True))
+    def get(self):
+        return UserModel.query.all()
