@@ -6,10 +6,10 @@ from resources.vehicle import blp as VehicleBlueprint
 
 
 API_NAME = "Vehicles MS."
-
+BLUEPRINTS = [VehicleBlueprint]
 
 if __name__ == "__main__":
-    app = create_app(API_NAME, blueprints=[VehicleBlueprint])
+    app = create_app(API_NAME, blueprints=BLUEPRINTS)
 
     if app.config['DEBUG']:
         with app.app_context():

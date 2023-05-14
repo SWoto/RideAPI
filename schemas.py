@@ -20,7 +20,7 @@ class PlainVehicleSchema(Schema):
 
 
 class UserSchema(PlainUserSchema):
-    vehicles = fields.List(fields.Nested(PlainVehicleSchema()), dump_only=True)
+    vehicles = fields.List(fields.Nested(PlainVehicleSchema()), dump_only=True, many=True)
 
 
 class VehicleSchema(PlainVehicleSchema):
