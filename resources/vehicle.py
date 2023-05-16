@@ -22,8 +22,10 @@ class VehicleRegister(MethodView):
     @blp.arguments(VehicleSchema)
     @blp.response(201, VehicleSchema)
     def post(self, vehicle_data):
-        vehicle = VehicleModel(**vehicle_data, 
-                               id=uuid.uuid4().hex)
+        if VehicleModel.find_by_license_plate(vehicle_data['license_plate']):
+            abort(409, message="A vehicle with that license plate already exists")
+
+        vehicle = VehicleModel(**vehicle_data)
         vehicle.save_to_db()
         return vehicle
         
