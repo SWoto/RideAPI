@@ -13,8 +13,10 @@ from schemas import VehicleSchema
 blp = Blueprint("Vehicles", "vehicles",
                 description="Operation os vehicles. Register them to users and rides.")
 
+# TODO: Add user valdiation when adding vehicle
+# TODO: Add test
 
-#TODO: Add test
+
 @blp.route("/register")
 class VehicleRegister(MethodView):
 
@@ -28,5 +30,5 @@ class VehicleRegister(MethodView):
         vehicle = VehicleModel(**vehicle_data)
         vehicle.save_to_db()
         return vehicle
-        
+
 

@@ -2,30 +2,19 @@ import json
 import uuid
 
 from tests.base_test import UserBaseTest
-from models.user import UserModel
+from models import UserModel
 from db import db
 
 
 class UserTest(UserBaseTest):
-    default_data_in = {
-        'username': 'test_user',
-        'email': 'test@restapi.com',
-        'password': 'test_secure',
-        'role': 0,
-    }
-
-    default_data_out = {
-        'username': 'test_user',
-        'email': 'test@restapi.com',
-        'role': 0,
-        'vehicles': [],
-    }
 
     def test_register_user(self):
         data_in = UserTest.default_data_in.copy()
+        data_out = UserTest.default_data_out.copy()
 
         with self.app() as client:
             with self.app_context():
+
                 request = client.post('/register', json=data_in)
 
                 self.assertEqual(request.status_code, 201)
@@ -35,10 +24,11 @@ class UserTest(UserBaseTest):
                 received = json.loads(request.data)
                 received.pop('id')
 
-                self.assertDictEqual(UserTest.default_data_out, received)
+                self.assertDictEqual(data_out, received)
 
     def test_register_duplicated_user(self):
         data_in = UserTest.default_data_in.copy()
+        data_out = UserTest.default_data_out.copy()
 
         with self.app() as client:
             with self.app_context():
@@ -47,7 +37,7 @@ class UserTest(UserBaseTest):
                 received = json.loads(request.data)
                 received.pop('id')
 
-                self.assertDictEqual(UserTest.default_data_out, received)
+                self.assertDictEqual(data_out, received)
 
                 request = client.post('/register', json=data_in)
 
@@ -57,8 +47,7 @@ class UserTest(UserBaseTest):
 
     def test_get_user(self):
         data_in = UserTest.default_data_in.copy()
-
-        data_expected = UserTest.default_data_out.copy()
+        data_out = UserTest.default_data_out.copy()
 
         with self.app() as client:
             with self.app_context():
@@ -74,11 +63,11 @@ class UserTest(UserBaseTest):
                 id = json.loads(request.data)['id']
                 request = client.get('/user/{}'.format(id))
 
-                data_expected['id'] = id
+                data_out['id'] = id
                 self.assertEqual(request.status_code, 200,
                                  "Could not receive user information")
                 self.assertDictEqual(json.loads(
-                    request.data), data_expected, "User received data does not meet standart")
+                    request.data), data_out, "User received data does not meet standart")
 
     def test_delete_user(self):
         data_in = UserTest.default_data_in.copy()

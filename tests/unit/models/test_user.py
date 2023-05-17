@@ -1,18 +1,18 @@
-import unittest
 from passlib.hash import pbkdf2_sha256
+import uuid
 
 from models import UserModel
+from tests.base_test import UserBaseTest
 
 FAILURE_CONTRUCT_ARGUMENT =  "The {} after creation does not equal the constructor argument."
 
-class UserTest(unittest.TestCase):
+class UserTest(UserBaseTest):
     def test_create_user(self):
-        user = UserModel(username='test_user',
-                         email='test@restapi.com',
-                         password='test_secure',
-                         role=0)
+        data_in = UserTest.default_data_in.copy()
+        user = UserModel(**data_in)
 
-        self.assertEqual(user.username,'test_user', FAILURE_CONTRUCT_ARGUMENT.format('username'))
-        self.assertEqual(user.email,'test@restapi.com', FAILURE_CONTRUCT_ARGUMENT.format('email'))
-        self.assertTrue(pbkdf2_sha256.verify('test_secure', user.password), FAILURE_CONTRUCT_ARGUMENT.format('password'))
-        self.assertEqual(user.role,0, FAILURE_CONTRUCT_ARGUMENT.format('role'))
+        self.assertEqual(uuid.UUID(user.id).version, 4)
+        self.assertEqual(user.username,data_in['username'], FAILURE_CONTRUCT_ARGUMENT.format('username'))
+        self.assertEqual(user.email,data_in['email'], FAILURE_CONTRUCT_ARGUMENT.format('email'))
+        self.assertTrue(pbkdf2_sha256.verify(data_in['password'], user.password), FAILURE_CONTRUCT_ARGUMENT.format('password'))
+        self.assertEqual(user.role_id,data_in['role_id'], FAILURE_CONTRUCT_ARGUMENT.format('role'))

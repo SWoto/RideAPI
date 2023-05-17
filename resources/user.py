@@ -15,6 +15,8 @@ blp = Blueprint("Users", "users",
                 description="Operation on users, be they drivers or passagens.")
 
 
+#TODO: Add role valdiation
+#TODO: Add vehicle validation
 @blp.route("/register")
 class UserRegister(MethodView):
     @blp.arguments(UserSchema)
@@ -76,7 +78,15 @@ class UserList(MethodView):
         return UserModel.query.all()
 
 # TODO: Add test
-@blp.route('/user/roles')
+@blp.route('/user/role/<string:role_id>')
+class Role(MethodView):
+    @blp.response(200, UserRoleSchema)
+    def get(self, role_id):
+        role = UserRoleModel.query.get_or_404(role_id)
+        return role
+
+# TODO: Add test
+@blp.route('/user/role')
 class UserRoleList(MethodView):
     @blp.response(200, UserRoleSchema(many=True))
     def get(self):

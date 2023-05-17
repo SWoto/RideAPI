@@ -1,6 +1,5 @@
 from tests.base_test import VehiclesBaseTest
-from models.vehicle import VehicleModel
-from models.user import UserModel
+from models import VehicleModel
 
 FAILED_TO_FIND_VEHICLE_WITH = "Did not find a vehicle with {} '{}'"
 FAILED_DUPLICATED = "Duplicated - vehicle {} was previusly added to the database"
