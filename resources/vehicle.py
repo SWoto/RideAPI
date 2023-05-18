@@ -30,5 +30,3 @@ class VehicleRegister(MethodView):
         vehicle = VehicleModel(**vehicle_data)
         vehicle.save_to_db()
         return vehicle
-
-

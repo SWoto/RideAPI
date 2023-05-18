@@ -15,8 +15,8 @@ blp = Blueprint("Users", "users",
                 description="Operation on users, be they drivers or passagens.")
 
 
-#TODO: Add role valdiation
-#TODO: Add vehicle validation
+#TODO: Add role valdiation (post_load decorator?)
+#TODO: Add vehicle validation (post_load decorator?)
 @blp.route("/register")
 class UserRegister(MethodView):
     @blp.arguments(UserSchema)
@@ -91,3 +91,5 @@ class UserRoleList(MethodView):
     @blp.response(200, UserRoleSchema(many=True))
     def get(self):
         return UserRoleModel.query.all()
+
+#TODO: Add register role endpoint
