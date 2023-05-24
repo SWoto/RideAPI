@@ -6,14 +6,13 @@ from flask_smorest import Blueprint, abort
 from flask_jwt_extended import get_jwt, jwt_required
 
 from db import db
-from models import VehicleModel
+from models import VehicleModel, UserModel
 from schemas import VehicleSchema
 
 
 blp = Blueprint("Vehicles", "vehicles",
                 description="Operation os vehicles. Register them to users and rides.")
 
-# TODO: Add user valdiation when adding vehicle
 # TODO: Add test
 
 
@@ -26,6 +25,9 @@ class VehicleRegister(MethodView):
     def post(self, vehicle_data):
         if VehicleModel.find_by_license_plate(vehicle_data['license_plate']):
             abort(409, message="A vehicle with that license plate already exists")
+
+        if not UserModel.find_by_id(vehicle_data['user_id']):
+            abort(404, message="User not found")
 
         vehicle = VehicleModel(**vehicle_data)
         vehicle.save_to_db()
