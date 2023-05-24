@@ -10,8 +10,7 @@ import unittest
 
 from db import db
 from base_app import create_app
-from models.user import UserModel
-from models.vehicle import VehicleModel
+from models import UserModel, UserRoleModel
 from app_users import API_NAME as USER_API_NAME, BLUEPRINTS as USER_BLUEPRINTS
 from app_vehicles import API_NAME as VEHICLES_API_NAME, BLUEPRINTS as VEHICLES_BLUEPRINTS
 
@@ -44,6 +43,36 @@ class UserBaseTest(BaseTest):
     API_NAME = USER_API_NAME
     BLUEPRINTS = USER_BLUEPRINTS
 
+    default_data_in = {
+        'username': 'test_user',
+        'email': 'test@restapi.com',
+        'password': 'test_secure',
+        'role_id': "",
+    }
+
+    default_data_out = {
+        'username': 'test_user',
+        'email': 'test@restapi.com',
+        'role': {},
+        'vehicles': [],
+    }
+
+    def setUp(self):
+        super(UserBaseTest, self).setUp()
+        with self.app_context():
+            UserBaseTest.set_role()
+
+    @classmethod
+    def set_role(cls):
+        role_info = {"name": "test_role"}   
+        role = UserRoleModel(**role_info)
+        role.save_to_db()
+
+        role_info['id'] = role.id
+        cls.default_data_in['role_id'] = role.id
+        cls.default_data_out['role'] = role_info.copy()
+
+
 
 class VehiclesBaseTest(BaseTest):
     API_NAME = VEHICLES_API_NAME
@@ -60,14 +89,20 @@ class VehiclesBaseTest(BaseTest):
     def setUp(self):
         super(VehiclesBaseTest, self).setUp()
         with self.app_context():
-            data_in = {
-                'username': 'test_user',
-                'email': 'test@restapi.com',
-                'password': 'test_secure',
-                'role': 0,
-            }
-            user = UserModel(**data_in)
+            UserBaseTest.set_role()
+            user_data_in = UserBaseTest.default_data_in.copy()
+
+            user = UserModel(**user_data_in)
             user.save_to_db()
             
             VehiclesBaseTest.vehicle_data["user_id"] = user.id
+
+
+class UserRoleBaseTest(BaseTest):
+    API_NAME = USER_API_NAME
+    BLUEPRINTS = USER_BLUEPRINTS
+
+    default_data_in = {
+        'name': 'test_user_role',
+    }
 

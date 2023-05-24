@@ -1,8 +1,7 @@
 import unittest
 import uuid
-from marshmallow.exceptions import ValidationError
-
 from schemas import VehicleSchema
+
 
 class VehicleSchemaTest(unittest.TestCase):
     data_in = {
@@ -10,7 +9,7 @@ class VehicleSchemaTest(unittest.TestCase):
         "license_plate": "ABC0D12",
         "manufacturer": "Chevrolet",
         "model": "Onix",
-        "user_id":uuid.uuid4().hex,
+        "user_id": uuid.uuid4().hex,
     }
 
     data_out = {
@@ -18,11 +17,10 @@ class VehicleSchemaTest(unittest.TestCase):
         "license_plate": "ABC0D12",
         "manufacturer": "Chevrolet",
         "model": "Onix",
-        "id":uuid.uuid4().hex,
-        "user":{
-           "email": "test@restapi.com",
+        "id": uuid.uuid4().hex,
+        "user": {
+            "email": "test@restapi.com",
             "id": uuid.uuid4().hex,
-            "role": 0,
             "username": "test_user",
         }
     }
@@ -33,5 +31,5 @@ class VehicleSchemaTest(unittest.TestCase):
 
     def test_dump(self):
         schema = VehicleSchema()
-        self.assertEqual(VehicleSchemaTest.data_out, schema.dump(VehicleSchemaTest.data_out))
-
+        self.assertEqual(VehicleSchemaTest.data_out,
+                         schema.dump(VehicleSchemaTest.data_out))

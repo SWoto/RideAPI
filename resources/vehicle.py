@@ -13,8 +13,10 @@ from schemas import VehicleSchema
 blp = Blueprint("Vehicles", "vehicles",
                 description="Operation os vehicles. Register them to users and rides.")
 
+# TODO: Add user valdiation when adding vehicle
+# TODO: Add test
 
-#TODO: Add test
+
 @blp.route("/register")
 class VehicleRegister(MethodView):
 
@@ -22,9 +24,18 @@ class VehicleRegister(MethodView):
     @blp.arguments(VehicleSchema)
     @blp.response(201, VehicleSchema)
     def post(self, vehicle_data):
-        vehicle = VehicleModel(**vehicle_data, 
-                               id=uuid.uuid4().hex)
+        if VehicleModel.find_by_license_plate(vehicle_data['license_plate']):
+            abort(409, message="A vehicle with that license plate already exists")
+
+        vehicle = VehicleModel(**vehicle_data)
         vehicle.save_to_db()
         return vehicle
-        
 
+
+@blp.route("/vehicle")
+class VehicleList(MethodView):
+
+    @blp.response(200, VehicleSchema(many=True))
+    def get(self):
+        print(VehicleModel.query.all())
+        return VehicleModel.query.all()

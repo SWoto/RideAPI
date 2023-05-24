@@ -1,14 +1,11 @@
 from marshmallow import Schema, fields
 
 
-#TODO: Better analyze this schema and improve it with more 
-# required fields and create a new one for login only
 class PlainUserSchema(Schema):
     id = fields.String(dump_only=True)
-    username = fields.Str()
+    username = fields.Str(required=True)
     email = fields.Str(required=True)
     password = fields.Str(required=True, load_only=True)
-    role = fields.Int()
 
 
 class PlainVehicleSchema(Schema):
@@ -19,8 +16,21 @@ class PlainVehicleSchema(Schema):
     consumption = fields.Float(required=True)
 
 
+class UserLoginSchema(Schema):
+    email = fields.Str(required=True)
+    password = fields.Str(required=True, load_only=True)
+
+
+class UserRoleSchema(Schema):
+    id = fields.String(dump_only=True)
+    name = fields.Str(require=True)
+
+
 class UserSchema(PlainUserSchema):
-    vehicles = fields.List(fields.Nested(PlainVehicleSchema()), dump_only=True, many=True)
+    role_id = fields.String(required=True, load_only=True)
+    vehicles = fields.List(fields.Nested(
+        PlainVehicleSchema()), dump_only=True, many=True)
+    role = fields.Nested(UserRoleSchema(), dump_only=True)
 
 
 class VehicleSchema(PlainVehicleSchema):

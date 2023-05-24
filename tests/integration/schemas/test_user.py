@@ -9,14 +9,14 @@ class UserSchemaTest(unittest.TestCase):
         'username': 'test_user',
         'email': 'test@restapi.com',
         'password': 'test_secure',
-        'role': 0,
+        'role_id': uuid.uuid4().hex,
     }
 
     data_out = {
         'username': 'test_user',
         'email': 'test@restapi.com',
-        'role': 0,
         'id': uuid.uuid4().hex,
+        'role': {},
         'vehicles': [],
     }
 
@@ -48,6 +48,40 @@ class UserSchemaTest(unittest.TestCase):
 
     def test_dump_with_multi_vechiles(self):
         data_out = UserSchemaTest.data_out.copy()
+        data_out['vehicles'] = [
+            {
+                "consumption": 11.55,
+                "license_plate": "ABC0D12",
+                "manufacturer": "Chevrolet",
+                "model": "Onix",
+                "id": uuid.uuid4().hex,
+            },
+            {
+                "consumption": 13.99,
+                "license_plate": "DEF0D41",
+                "manufacturer": "Chevrolet2",
+                "model": "Onix2",
+                "id": uuid.uuid4().hex,
+            },
+        ]
+
+    def test_dump_with_role(self):
+        data_out = UserSchemaTest.data_out.copy()
+        data_out['role'] = {
+            "id": "35adabfd7f204da49a3b3527fe668aae",
+            "name": "user"
+        }
+        schema = UserSchema()
+
+        self.assertEqual(UserSchemaTest.data_out, schema.dump(
+            UserSchemaTest.data_out), "Failed to dump data through schema")
+
+    def test_dump_with_role_vehicles(self):
+        data_out = UserSchemaTest.data_out.copy()
+        data_out['role'] = {
+            "id": "35adabfd7f204da49a3b3527fe668aae",
+            "name": "user"
+        }
         data_out['vehicles'] = [
             {
                 "consumption": 11.55,
