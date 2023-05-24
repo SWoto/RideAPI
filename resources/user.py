@@ -69,7 +69,7 @@ class User(MethodView):
 
         return {"message": "User deleted."}, 200
 
-# TODO: Add test
+
 @blp.route('/user')
 class UserList(MethodView):
     @jwt_required()
@@ -77,19 +77,30 @@ class UserList(MethodView):
     def get(self):
         return UserModel.query.all()
 
-# TODO: Add test
+
 @blp.route('/user/role/<string:role_id>')
-class Role(MethodView):
+class UserRole(MethodView):
     @blp.response(200, UserRoleSchema)
     def get(self, role_id):
         role = UserRoleModel.query.get_or_404(role_id)
         return role
 
-# TODO: Add test
+
 @blp.route('/user/role')
 class UserRoleList(MethodView):
     @blp.response(200, UserRoleSchema(many=True))
     def get(self):
         return UserRoleModel.query.all()
 
-#TODO: Add register role endpoint
+#TODO: Add test
+@blp.route('/user/role/register')
+class UserRoleRegister(MethodView):
+    @blp.arguments(UserRoleSchema)
+    @blp.response(201, UserRoleSchema)
+    def post(self, user_role_data):
+        if UserRoleModel.find_by_name(user_role_data['name']):
+            abort(409, message="An user role with that name already exists.")
+        
+        role = UserRoleModel(**user_role_data)
+        role.save_to_db()
+        return role

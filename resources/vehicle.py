@@ -30,3 +30,12 @@ class VehicleRegister(MethodView):
         vehicle = VehicleModel(**vehicle_data)
         vehicle.save_to_db()
         return vehicle
+
+
+@blp.route("/vehicle")
+class VehicleList(MethodView):
+
+    @blp.response(200, VehicleSchema(many=True))
+    def get(self):
+        print(VehicleModel.query.all())
+        return VehicleModel.query.all()

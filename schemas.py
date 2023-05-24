@@ -1,8 +1,6 @@
 from marshmallow import Schema, fields
 
 
-# TODO: Better analyze this schema and improve it with more
-# required fields and create a new one for login only
 class PlainUserSchema(Schema):
     id = fields.String(dump_only=True)
     username = fields.Str(required=True)
