@@ -96,6 +96,7 @@ class UserRoleList(MethodView):
 #TODO: Add test
 @blp.route('/user/role/register')
 class UserRoleRegister(MethodView):
+    @jwt_required()
     @blp.arguments(UserRoleSchema)
     @blp.response(201, UserRoleSchema)
     def post(self, user_role_data):
