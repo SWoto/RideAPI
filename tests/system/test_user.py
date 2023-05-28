@@ -165,7 +165,6 @@ class UserTest(UserBaseTest):
 
         with self.app() as client:
             with self.app_context():
-                # test without registering
                 client.post('/register', json=data_in_register)
 
                 request = client.post('/login', json=data_in_login)
@@ -233,3 +232,26 @@ class UserTest(UserBaseTest):
                 all_roles = [UserRoleSchema().dump(role) for role in UserRoleModel.query.all()]
                 request = client.get('/user/role')
                 self.assertListEqual(all_roles, json.loads(request.data))
+
+    
+    def test_register_user_role(self):
+        data_in_register = UserTest.default_data_in.copy()
+
+        data_in_login = {
+            'email': data_in_register['email'],
+            'password': data_in_register['password'],
+        }
+
+        with self.app() as client:
+            with self.app_context():
+                client.post('/register', json=data_in_register)
+
+                request = client.post('/login', json=data_in_login)
+                jwt = json.loads(request.data)['access_token']
+
+                request = client.post('/user/role/register', json={'name':'test_register_role'}, headers={'Authorization': 'Bearer {}'.format(jwt)})
+                self.assertEqual("test_register_role", json.loads(request.data)['name'])
+                
+
+
+
