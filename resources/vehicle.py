@@ -13,8 +13,6 @@ from schemas import VehicleSchema
 blp = Blueprint("Vehicles", "vehicles",
                 description="Operation os vehicles. Register them to users and rides.")
 
-# TODO: Add test
-
 
 @blp.route("/register")
 class VehicleRegister(MethodView):
@@ -34,10 +32,29 @@ class VehicleRegister(MethodView):
         return vehicle
 
 
+# TODO: Add to postman
+@blp.route("/vehicle/<string:vehicle_id>")
+class Vehicle(MethodView):
+
+    @blp.response(200, VehicleSchema)
+    def get(self, vehicle_id):
+        return VehicleModel.query.get_or_404(vehicle_id)
+
+
+    @jwt_required()
+    def delete(self, vehicle_id):
+        vehicle = VehicleModel.query.get_or_404(vehicle_id)
+        vehicle.delete_from_db()
+        return {"message": "User deleted."}, 200
+
+
 @blp.route("/vehicle")
 class VehicleList(MethodView):
 
+    @jwt_required()
     @blp.response(200, VehicleSchema(many=True))
     def get(self):
         print(VehicleModel.query.all())
         return VehicleModel.query.all()
+
+
