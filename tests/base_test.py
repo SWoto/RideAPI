@@ -6,7 +6,9 @@ It allows for instantiation of the database dynamically,
 and makes sure that it is a new, blank database each time.
 """
 
+
 import unittest
+from flask_jwt_extended import create_access_token
 
 from db import db
 from base_app import create_app
@@ -62,6 +64,7 @@ class UserBaseTest(BaseTest):
         with self.app_context():
             UserBaseTest.set_role()
 
+
     @classmethod
     def set_role(cls):
         role_info = {"name": "test_role"}   
@@ -78,12 +81,27 @@ class VehiclesBaseTest(BaseTest):
     API_NAME = VEHICLES_API_NAME
     BLUEPRINTS = VEHICLES_BLUEPRINTS
 
-    vehicle_data = {
+    vehicle_data_in = {
         "consumption": 11.55,
         "license_plate": "ABC0D12",
         "manufacturer": "Chevrolet",
-        "model": "Onix"
+        "model": "Onix",
+        "user_id":"",
     }
+
+    #note that ID is missing
+    vehicle_data_out = {
+        "consumption": 11.55,
+        "license_plate": "ABC0D12",
+        "manufacturer": "Chevrolet",
+        "model": "Onix",
+        "user":{},
+    }
+
+    data_user_login_ok = {
+            'email': 'test@restapi.com',
+            'password': 'test_secure',
+        }
 
 
     def setUp(self):
@@ -95,7 +113,13 @@ class VehiclesBaseTest(BaseTest):
             user = UserModel(**user_data_in)
             user.save_to_db()
             
-            VehiclesBaseTest.vehicle_data["user_id"] = user.id
+            VehiclesBaseTest.vehicle_data_in["user_id"] = user.id
+            VehiclesBaseTest.vehicle_data_out["user"] = {
+                "username":user.username,
+                "email":user.email,
+                "id":user.id,
+            }
+            self.access_token = create_access_token(identity=user.id, fresh=True)
 
 
 class UserRoleBaseTest(BaseTest):
