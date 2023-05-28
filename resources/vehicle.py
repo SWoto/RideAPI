@@ -32,14 +32,12 @@ class VehicleRegister(MethodView):
         return vehicle
 
 
-# TODO: Add to postman
 @blp.route("/vehicle/<string:vehicle_id>")
 class Vehicle(MethodView):
 
     @blp.response(200, VehicleSchema)
     def get(self, vehicle_id):
         return VehicleModel.query.get_or_404(vehicle_id)
-
 
     @jwt_required()
     def delete(self, vehicle_id):
@@ -56,5 +54,3 @@ class VehicleList(MethodView):
     def get(self):
         print(VehicleModel.query.all())
         return VehicleModel.query.all()
-
-
