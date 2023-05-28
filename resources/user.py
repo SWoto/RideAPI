@@ -14,6 +14,7 @@ from schemas import UserSchema, UserLoginSchema, UserRoleSchema
 blp = Blueprint("Users", "users",
                 description="Operation on users, be they drivers or passagens.")
 
+
 @blp.route("/register")
 class UserRegister(MethodView):
     @blp.arguments(UserSchema)
@@ -93,7 +94,7 @@ class UserRoleList(MethodView):
     def get(self):
         return UserRoleModel.query.all()
 
-#TODO: Add test
+
 @blp.route('/user/role/register')
 class UserRoleRegister(MethodView):
     @jwt_required()
@@ -102,7 +103,7 @@ class UserRoleRegister(MethodView):
     def post(self, user_role_data):
         if UserRoleModel.find_by_name(user_role_data['name']):
             abort(409, message="An user role with that name already exists.")
-        
+
         role = UserRoleModel(**user_role_data)
         role.save_to_db()
         return role
