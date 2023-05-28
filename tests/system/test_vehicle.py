@@ -103,4 +103,4 @@ class VehicleTest(VehiclesBaseTest):
 
                 self.assertEqual(request.status_code, 200)
                 self.assertEqual(json.loads(request.text)[
-                                 'message'], "User deleted.")
+                                 'message'], "Vehicle deleted.")
