@@ -9,7 +9,7 @@ FAILED_DELETE_FROM_DB = "Found vehicle '{}' after delete_from_db"
 
 class VehicleTest(VehiclesBaseTest):
     def test_save_to_db(self):
-        vehicle = VehicleModel(**VehicleTest.vehicle_data)
+        vehicle = VehicleModel(**VehicleTest.vehicle_data_in)
 
         with self.app_context():
             vehicle.save_to_db()
@@ -17,7 +17,7 @@ class VehicleTest(VehiclesBaseTest):
                 id=vehicle.id).first(), FAILED_SAVE_TO_DB.format(vehicle.license_plate))
 
     def test_delete_from_db(self):
-        vehicle = VehicleModel(**VehicleTest.vehicle_data)
+        vehicle = VehicleModel(**VehicleTest.vehicle_data_in)
 
         with self.app_context():
             vehicle.save_to_db()
@@ -29,14 +29,14 @@ class VehicleTest(VehiclesBaseTest):
                 id=vehicle.id).first(), FAILED_DELETE_FROM_DB.format(vehicle.license_plate))
 
     def test_find_by_id(self):
-        vehicle = VehicleModel(**VehicleTest.vehicle_data)
+        vehicle = VehicleModel(**VehicleTest.vehicle_data_in)
 
         with self.app_context():
             vehicle.save_to_db()
             self.assertIsNotNone(VehicleModel.find_by_id(vehicle.id), FAILED_TO_FIND_VEHICLE_WITH.format("license_plate", vehicle.license_plate))
 
     def test_find_by_license_plate(self):
-        vehicle = VehicleModel(**VehicleTest.vehicle_data)
+        vehicle = VehicleModel(**VehicleTest.vehicle_data_in)
 
         with self.app_context():
             vehicle.save_to_db()
@@ -44,7 +44,7 @@ class VehicleTest(VehiclesBaseTest):
 
 
     def test_crud(self):
-        vehicle = VehicleModel(**VehicleTest.vehicle_data)
+        vehicle = VehicleModel(**VehicleTest.vehicle_data_in)
 
         with self.app_context():
             self.assertIsNone(VehicleModel.query.filter_by(

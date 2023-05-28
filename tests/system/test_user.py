@@ -78,14 +78,21 @@ class UserTest(UserBaseTest):
             with self.app_context():
                 # test without registering
                 request = client.delete('/user/{}'.format(uuid.uuid4().hex))
-                self.assertEqual(request.status_code, 404)
-                self.assertEqual(json.loads(request.data)[
-                                 'status'], "Not Found")
+                self.assertEqual(request.status_code, 401)
+                self.assertEqual(json.loads(request.text)[
+                                 "msg"], "Missing Authorization Header")
 
                 request = client.post('/register', json=data_in)
-
                 id = json.loads(request.data)['id']
-                request = client.delete('/user/{}'.format(id))
+
+                data_in_login_ok = {
+                    'email': data_in['email'],
+                    'password': data_in['password'],
+                }
+                request = client.post('/login', json=data_in_login_ok)
+                jwt = json.loads(request.data)['access_token']
+                
+                request = client.delete('/user/{}'.format(id), headers={'Authorization': 'Bearer {}'.format(jwt)})
 
                 data_expected['id'] = id
                 self.assertEqual(request.status_code, 200,
@@ -174,7 +181,8 @@ class UserTest(UserBaseTest):
                 self.assertEqual(json.loads(request.data)[
                                  'description'], "The token has been revoked.")
 
-    def test_get_all_users(self, users_cnt=5):
+    def test_get_all_users(self):
+        users_cnt=5
         data_in_register = UserTest.default_data_in.copy()
         data_out_register = UserTest.default_data_out.copy()
         data_in_register_multi_users = []

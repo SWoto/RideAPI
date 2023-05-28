@@ -13,9 +13,28 @@ class VehiclePlainSchemaTest(unittest.TestCase):
         "model": "Onix",
     }
 
+    data_in_wrong = {
+        "consumption": -5,
+        "license_plate": "123",
+        "manufacturer": "Chevrolet",
+        "model": "Onix",
+    }
+
     def test_load(self):
         schema = PlainVehicleSchema()
         schema.load(VehiclePlainSchemaTest.data_in)
+
+    def test_load_invalid_consuption(self):
+        data_in = VehiclePlainSchemaTest.data_in.copy()
+        data_in['consumption'] = -5
+        schema = PlainVehicleSchema()
+        self.assertRaises(ValidationError, schema.load, data_in)
+
+    def test_load_invalid_license_plate(self):
+        data_in = VehiclePlainSchemaTest.data_in.copy()
+        data_in['license_plate'] = "123"
+        schema = PlainVehicleSchema()
+        self.assertRaises(ValidationError, schema.load, data_in)
 
     def test_load_with_id(self):
         data_in = VehiclePlainSchemaTest.data_in.copy()
