@@ -14,9 +14,6 @@ from schemas import UserSchema, UserLoginSchema, UserRoleSchema
 blp = Blueprint("Users", "users",
                 description="Operation on users, be they drivers or passagens.")
 
-
-#TODO: Add role valdiation (post_load decorator?)
-#TODO: Add vehicle validation (post_load decorator?)
 @blp.route("/register")
 class UserRegister(MethodView):
     @blp.arguments(UserSchema)
@@ -24,6 +21,9 @@ class UserRegister(MethodView):
     def post(self, user_data):
         if UserModel.find_by_email(user_data['email']):
             abort(409, message="An user with that email already exists.")
+
+        if not UserRoleModel.find_by_id(user_data["role_id"]):
+            abort(404, message="Role not found")
 
         user = UserModel(**user_data)
 
