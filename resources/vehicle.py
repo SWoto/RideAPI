@@ -45,7 +45,7 @@ class Vehicle(MethodView):
     def delete(self, vehicle_id):
         vehicle = VehicleModel.query.get_or_404(vehicle_id)
         vehicle.delete_from_db()
-        return {"message": "User deleted."}, 200
+        return {"message": "Vehicle deleted."}, 200
 
 
 @blp.route("/vehicle")
