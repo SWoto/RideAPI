@@ -8,7 +8,7 @@ class BaseModel(db.Model):
 
     id = db.Column(db.String(32), primary_key=True)
     # TODO: Maybe add created and updated later...
-    # created_on = db.Column(db.DateTime, default=db.func.now())
+    created_on = db.Column(db.DateTime, default=db.func.now())
     # updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
     def __init__(self, **kwargs):

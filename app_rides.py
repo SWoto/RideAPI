@@ -16,4 +16,4 @@ if __name__ == "__main__":
             def create_tables():
                 db.create_all()
 
-    app.run(host="0.0.0.0", port=os.getenv("REQUESTS_API_PORT"))
+    app.run(host="0.0.0.0", port=os.getenv("RIDES_API_PORT"))
