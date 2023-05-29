@@ -1,9 +1,6 @@
 import json
-from jwt import encode
 
 from tests.base_test import VehiclesBaseTest
-from models import VehicleModel
-from schemas import VehicleSchema
 
 
 class VehicleTest(VehiclesBaseTest):

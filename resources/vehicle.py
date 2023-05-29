@@ -1,11 +1,7 @@
-import uuid
-import os
-
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
-from flask_jwt_extended import get_jwt, jwt_required
+from flask_jwt_extended import jwt_required
 
-from db import db
 from models import VehicleModel, UserModel
 from schemas import VehicleSchema
 
