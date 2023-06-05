@@ -1,11 +1,11 @@
-from marshmallow import Schema, fields, validates_schema, ValidationError
+from marshmallow import Schema, fields, validates_schema, ValidationError, validates
 import re
 
 
 class PlainUserSchema(Schema):
     id = fields.String(dump_only=True)
     username = fields.Str(required=True)
-    email = fields.Str(required=True)
+    email = fields.Email(required=True)
     password = fields.Str(required=True, load_only=True)
 
 
@@ -16,17 +16,24 @@ class PlainVehicleSchema(Schema):
     license_plate = fields.Str(required=True)
     consumption = fields.Float(required=True)
 
-    @validates_schema
-    def validate_license_plate(self, data, **kwargs):
-        match = re.search(r'[A-Z]{3}[0-9][0-9A-Z][0-9]{2}', data['license_plate'])
+    @validates(field_name="license_plate")
+    def validate_license_plate(self, data):
+        match = re.search(r'[A-Z]{3}[0-9][0-9A-Z][0-9]{2}', data)
         if not match:
             raise ValidationError("Invalid license plate format. Expected format is the vehicle registration plates of the Mercosur")
 
-    @validates_schema
-    def validate_consumption(self, data, **kwargs):
-        consumption = data['consumption']
-        if consumption <= 0 or consumption >= 100:
+    @validates(field_name="consumption")
+    def validate_consumption(self, data):
+        if data <= 0 or data >= 100:
             raise ValidationError("Invalid consumption. Accepted range 0 < x < 100")
+
+
+class PlainRideSchema(Schema):
+    id = fields.String(dump_only=True)
+    distance = fields.Float(required=True)
+    gas_price = fields.Float(required=True)
+    total_value = fields.Float(dump_only=True)
+
 
 class UserLoginSchema(Schema):
     email = fields.Str(required=True)
@@ -48,3 +55,10 @@ class UserSchema(PlainUserSchema):
 class VehicleSchema(PlainVehicleSchema):
     user_id = fields.String(required=True, load_only=True)
     user = fields.Nested(PlainUserSchema(), dump_only=True)
+
+
+class RideSchema(PlainRideSchema):
+    user_id = fields.String(required=True, load_only=True)
+    driver_id = fields.String(required=True, load_only=True)
+    user = fields.Nested(PlainUserSchema(), dump_only=True)
+    driver = fields.Nested(PlainUserSchema(), dump_only=True)
