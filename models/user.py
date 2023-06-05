@@ -1,7 +1,7 @@
 from passlib.hash import pbkdf2_sha256
 
 from db import db
-from models import BaseModel
+from models import BaseModel, UserRoleModel
 
 
 class UserModel(BaseModel):
@@ -16,6 +16,10 @@ class UserModel(BaseModel):
     role = db.relationship("UserRoleModel")
     vehicles = db.relationship(
         "VehicleModel", back_populates="user", lazy="dynamic")
+    rides_user = db.relationship("RideModel", foreign_keys="RideModel.user_id", viewonly=True)
+    rides_driver = db.relationship("RideModel", foreign_keys="RideModel.driver_id", viewonly=True)
+    
+
 
     def __init__(self, **kwargs):
         super(UserModel, self).__init__(**kwargs)
@@ -24,3 +28,15 @@ class UserModel(BaseModel):
     @classmethod
     def find_by_email(cls, email):
         return cls.query.filter_by(email=email).first()
+    
+    @classmethod
+    def __find_role_type_by_id(cls, _id, role_type):
+        return cls.query.join(cls.role).filter(UserRoleModel.name==role_type, cls.id==_id).first()
+    
+    @classmethod
+    def find_driver_by_id(cls, _id):
+        return cls.__find_role_type_by_id(_id, "driver")
+    
+    @classmethod
+    def find_user_by_id(cls, _id):
+        return cls.__find_role_type_by_id(_id, "user")
