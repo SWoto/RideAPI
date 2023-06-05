@@ -17,7 +17,9 @@
 							"script": {
 								"exec": [
 									"var data = pm.response.json();\r",
-									"pm.environment.set(\"user_id\", data.id);"
+									"\r",
+									"pm.environment.set(data[\"role\"][\"name\"]+\"_id\", data.id);\r",
+									"pm.environment.set(\"email\", data.email);"
 								],
 								"type": "text/javascript"
 							}
@@ -28,7 +30,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"test_user\",\r\n    \"email\": \"test6@restapi.com\",\r\n    \"password\": \"test_secure\",\r\n    \"role\": 0\r\n}",
+							"raw": "{\r\n    \"username\": \"test_user\",\r\n    \"email\": \"test_2@restapi.com\",\r\n    \"password\": \"{{password}}\",\r\n    \"role_id\": \"{{driver_role_id}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -80,6 +82,102 @@
 					"response": []
 				},
 				{
+					"name": "Get All Users - /user",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}:{{user_port}}/user",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{user_port}}",
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Roles - /user/role",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var data = pm.response.json();\r",
+									"for (var i in data){\r",
+									"    var obj = data[i];\r",
+									"    pm.environment.set(obj.name + \"_role_id\", obj.id);\r",
+									"} "
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}:{{user_port}}/user/role",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{user_port}}",
+							"path": [
+								"user",
+								"role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Delete User - /user/user_id",
 					"request": {
 						"method": "DELETE",
@@ -115,7 +213,8 @@
 							"script": {
 								"exec": [
 									"var data = pm.response.json();\r",
-									"pm.environment.set(\"access_token\", data.access_token);"
+									"pm.environment.set(\"access_token\", data.access_token);\r",
+									""
 								],
 								"type": "text/javascript"
 							}
@@ -126,7 +225,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"test5@restapi.com\",\r\n    \"password\": \"test_secure\"\r\n}",
+							"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -206,7 +305,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									""
+									"var data = pm.response.json();\r",
+									"pm.environment.set(\"vehicle_id\", data.id);"
 								],
 								"type": "text/javascript"
 							}
@@ -227,7 +327,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"manufacturer\": \"Chevrolet\",\r\n    \"model\": \"Onix\",\r\n    \"license_plate\": \"ABC0D12\",\r\n    \"consumption\": 11.55,\r\n    \"driver_id\":\"{{user_id}}\"\r\n}",
+							"raw": "{\r\n    \"manufacturer\": \"Chevrolet\",\r\n    \"model\": \"Onix\",\r\n    \"license_plate\": \"LSN8I49\",\r\n    \"consumption\": 11.55,\r\n    \"user_id\":\"{{user_id}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -246,8 +346,234 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get all Vechicles - /vehicle",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}:{{vehicle_port}}/vehicle",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{vehicle_port}}",
+							"path": [
+								"vehicle"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Vechicles - /vehicle/vehicle_id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}:{{vehicle_port}}/vehicle/{{vehicle_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{vehicle_port}}",
+							"path": [
+								"vehicle",
+								"{{vehicle_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Vechicle - /vehicle/vehicle_id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}:{{vehicle_port}}/vehicle/{{vehicle_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{vehicle_port}}",
+							"path": [
+								"vehicle",
+								"{{vehicle_id}}"
+							]
+						}
+					},
+					"response": []
 				}
 			]
+		},
+		{
+			"name": "Rides API",
+			"item": [
+				{
+					"name": "Register Ride - /register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var data = pm.response.json();\r",
+									"pm.environment.set(\"vehicle_id\", data.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"distance\": 35,\r\n    \"gas_price\": 5.99,\r\n    \"user_id\": \"asdasdasdasd\",\r\n    \"driver_id\": \"{{driver_id}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}:{{rides_port}}/register",
+							"host": [
+								"{{url}}"
+							],
+							"port": "{{rides_port}}",
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }
