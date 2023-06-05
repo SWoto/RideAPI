@@ -28,3 +28,4 @@ class RideRegister(MethodView):
 
 
         return ride
+
