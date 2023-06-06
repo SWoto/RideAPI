@@ -6,11 +6,12 @@ It allows for instantiation of the database dynamically,
 and makes sure that it is a new, blank database each time.
 """
 
-
+import os
 import unittest
 from flask_jwt_extended import create_access_token
 
 from db import db
+from sqlalchemy.sql import text
 from base_app import create_app
 from models import UserModel, UserRoleModel
 from app_users import API_NAME as USER_API_NAME, BLUEPRINTS as USER_BLUEPRINTS
@@ -18,15 +19,26 @@ from app_vehicles import API_NAME as VEHICLES_API_NAME, BLUEPRINTS as VEHICLES_B
 
 
 class BaseTest(unittest.TestCase):
-    SQLALCHEMY_DATABASE_URI = "sqlite:///"
+    SQLALCHEMY_DATABASE_URI = DATABASE_URL = "postgresql://{}:{}@127.0.0.1:5433/{}".format(
+            os.getenv(
+            "POSTGRES_USER"), os.getenv(
+            "POSTGRES_PASSWORD"), os.getenv(
+            "POSTGRES_DB"))
 
     @classmethod
     def setUpClass(cls):
+        os.environ["UNITTEST"] = "1"
         cls._app = create_app(
             cls.API_NAME, blueprints=cls.BLUEPRINTS, db_url=BaseTest.SQLALCHEMY_DATABASE_URI)
 
+        # with db.engine.connect() as conn:
+        #     expected = [(1, 'test row 1', True), (2, 'test row 2', False)]
+        #     result = conn.execute(text("SELECT * FROM public.test"))
+
+
     @classmethod
     def tearDownClass(cls):
+        os.environ.pop("UNITTEST")
         pass
 
     def setUp(self):

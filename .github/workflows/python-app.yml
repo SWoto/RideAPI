@@ -22,13 +22,25 @@ jobs:
         image: redis:7.0-alpine
         ports:
           - 6379:6379
+      database-test:
+        image: postgres:latest
+        ports:
+          - 5433:5432
+        env:
+          POSTGRES_USER: ${{ vars.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
     - name: Connect to Redis
       run: |
         sudo apt-get install redis-tools
         redis-cli ping
-        
     - uses: actions/checkout@v3
     - name: Set up Python 3.11
       uses: actions/setup-python@v3
@@ -48,5 +60,10 @@ jobs:
     - name: Test with unicode
       env:
         JWT_SECRET_KEY: ${{ secrets.FLASK_JWT_SECRET }}
+        POSTGRES_HOST: postgres
+        POSTGRES_PORT: 5433
+        POSTGRES_USER: ${{ vars.POSTGRES_USER }}
+        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        POSTGRES_DB: ${{ vars.POSTGRES_DB }}
       run: |
         python -m unittest discover -v -s tests -p "test_*.py"

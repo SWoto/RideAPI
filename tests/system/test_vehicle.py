@@ -62,8 +62,8 @@ class VehicleTest(VehiclesBaseTest):
         data_in_multi = []
         data_out_multi = []
         for i in range(0, vehicles_cnt):
-            data_tmp_in = data_in.copy()
-            data_tmp_in['license_plate'] = "ABC0D12{}".format(i)
+            data_tmp_in = data_in.copy()  
+            data_tmp_in['license_plate'] = 'ABC0D1{}'.format(i)
             data_in_multi.append(data_tmp_in)
 
             data_tmp_out = data_out.copy()

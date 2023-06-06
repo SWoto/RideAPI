@@ -22,6 +22,16 @@ services:
       - ./db-data/:/var/lib/postgresql/data/
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
+  database-test:
+    image: 'postgres:latest'
+    ports:
+      - 5433:5432
+    env_file:
+      - .env
+    networks:
+      - postgres-network
+      
+
   pgadmin:
     image: dpage/pgadmin4
     ports:

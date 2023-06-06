@@ -90,6 +90,7 @@ def create_app(api_name, db_url=None, blueprints=None):
 
     @app.before_first_request
     def verify_db():
-        verify_init_sql()
+        if os.getenv("UNITTEST", "-1") != "1":
+            verify_init_sql()
 
     return app
