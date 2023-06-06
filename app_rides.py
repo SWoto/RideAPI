@@ -1,5 +1,6 @@
 import os
 
+
 from db import db
 from base_app import create_app
 from resources.ride import blp as RideBlueprint
