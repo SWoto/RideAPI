@@ -11,8 +11,4 @@ BLUEPRINTS = [VehicleBlueprint]
 if __name__ == "__main__":
     app = create_app(API_NAME, blueprints=BLUEPRINTS)
 
-    if app.config['DEBUG']:
-        with app.app_context():
-            db.create_all()
-
     app.run(host="0.0.0.0", port=os.getenv("VEHICLES_API_PORT"))

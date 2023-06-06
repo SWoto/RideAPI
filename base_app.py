@@ -5,12 +5,22 @@ from datetime import timedelta
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_smorest import Api, Blueprint
+from flask_migrate import Migrate
 
 from db import db, verify_init_sql
 from blocklist import jwt_redis_blocklist
 
+#Set it with powershell to run this command, then remove it
+# $env:ALEMBIC_MIGRATE="1"
+# $env:ALEMBIC_MIGRATE="-1"
+# on the same terminal session, run flask --app base_app.py db init
+# flask --app base_app.py db migrate
+if os.getenv("ALEMBIC_MIGRATE") == "1":
+    from resources import RideBlueprint, UserBlueprint, VehicleBlueprint
+    blueprints = [RideBlueprint, UserBlueprint, VehicleBlueprint]
 
-def create_app(api_name, db_url=None, blueprints=None):
+
+def create_app(api_name="", db_url=None, blueprints=blueprints):
     load_dotenv()
 
     def create_subapp(db_url, api_name):
@@ -41,6 +51,7 @@ def create_app(api_name, db_url=None, blueprints=None):
         app.config["DEBUG"] = True
 
         db.init_app(app)
+        migrate = Migrate(app, db)
         api = Api(app)
 
         app.config['JWT_SECRET_KEY'] = os.getenv(
@@ -88,9 +99,8 @@ def create_app(api_name, db_url=None, blueprints=None):
             else:
                 print("{} is not an instance of Blueprint".format(blp))
 
-
-    if os.getenv("UNITTEST", "-1") != "1":
-        with app.app_context():
+    with app.app_context():
+        if os.getenv("UNITTEST", "-1") != "1":
             verify_init_sql()
 
     return app

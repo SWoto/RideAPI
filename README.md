@@ -47,3 +47,23 @@ docker inspect <postgres_CONTAINER_ID>
 ```
 
 This will present its network settings and, in it, it's ip.
+
+## Migrate (Alembic)
+Always set the enviroment variable to use all the blueprints. **Remember to remove it latter.**
+```powershell
+$env:ALEMBIC_MIGRATE="1"
+```
+
+On the first run, use 
+```powershell
+flask --app base_app db init
+```
+
+To update the db with new changes:
+```
+flask --app base_app db migrate -m "<some text>"
+```
+:exclamation: :exclamation: :exclamation: **ALWAYS CHECK THE GENERATED FILES, it might cause unwanted effects when upgrading or downgrading**
+```
+flask --app base_app db upgrade
+```

@@ -12,10 +12,6 @@ BLUEPRINTS = [UserBlueprint]
 if __name__ == "__main__":
     app = create_app(API_NAME, blueprints=BLUEPRINTS)
 
-    if app.config['DEBUG']:
-        with app.app_context():
-            db.create_all()
-
     with app.app_context():
         role_passanger = {"name": "passanger"}
         role_admin = {"name": "driver"}
