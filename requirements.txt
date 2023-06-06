@@ -7,3 +7,4 @@ marshmallow
 python-dotenv
 gunicorn
 redis
+psycopg2
