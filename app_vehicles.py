@@ -13,8 +13,6 @@ if __name__ == "__main__":
 
     if app.config['DEBUG']:
         with app.app_context():
-            @app.before_first_request
-            def create_tables():
-                db.create_all()
+            db.create_all()
 
     app.run(host="0.0.0.0", port=os.getenv("VEHICLES_API_PORT"))

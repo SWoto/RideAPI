@@ -88,9 +88,9 @@ def create_app(api_name, db_url=None, blueprints=None):
             else:
                 print("{} is not an instance of Blueprint".format(blp))
 
-    @app.before_first_request
-    def verify_db():
-        if os.getenv("UNITTEST", "-1") != "1":
+
+    if os.getenv("UNITTEST", "-1") != "1":
+        with app.app_context():
             verify_init_sql()
 
     return app
