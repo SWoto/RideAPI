@@ -6,7 +6,7 @@ from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_smorest import Api, Blueprint
 
-from db import db
+from db import db, verify_init_sql
 from blocklist import jwt_redis_blocklist
 
 
@@ -19,8 +19,17 @@ def create_app(api_name, db_url=None, blueprints=None):
         # All loading stuffs and configuration
         app.config["PROPAGATE_EXCEPTION"] = os.getenv(
             "FLASK_PROPAGATE_EXCEPTION", False)
-        app.config["SQLALCHEMY_DATABASE_URI"] = db_url if db_url else os.getenv(
-            "DATABASE_URL", "sqlite///data.db")
+
+        POSTGRES_USER = os.getenv(
+            "POSTGRES_USER")
+        POSTGRES_PASSWORD = os.getenv(
+            "POSTGRES_PASSWORD")
+        POSTGRES_DB = os.getenv(
+            "POSTGRES_DB")
+
+        DATABASE_URL = "postgresql://{}:{}@127.0.0.1:5432/{}".format(
+            POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB)
+        app.config["SQLALCHEMY_DATABASE_URI"] = db_url if db_url else DATABASE_URL
 
         app.config["API_TITLE"] = "{} - {}".format(
             os.getenv("API_TITLE", ""), api_name)
@@ -55,22 +64,22 @@ def create_app(api_name, db_url=None, blueprints=None):
                         "description": "The token has been revoked.",
                         "error": "token_revoked"
                     }
-                ),401
+                ), 401
             )
-        
+
         @jwt.expired_token_loader
         def expired_token_callback(jwt_header, jwt_payload):
-            return(
+            return (
                 jsonify(
                     {
-                        "message":"The token has expired.",
-                        "error":"token_expired"
+                        "message": "The token has expired.",
+                        "error": "token_expired"
                     }
-                ),401
+                ), 401
             )
 
         return app, api
-    
+
     app, api = create_subapp(db_url, api_name)
     if blueprints:
         for blp in blueprints:
@@ -78,5 +87,9 @@ def create_app(api_name, db_url=None, blueprints=None):
                 api.register_blueprint(blp)
             else:
                 print("{} is not an instance of Blueprint".format(blp))
+
+    @app.before_first_request
+    def verify_db():
+        verify_init_sql()
 
     return app
