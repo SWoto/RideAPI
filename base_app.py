@@ -18,7 +18,8 @@ from blocklist import jwt_redis_blocklist
 if os.getenv("ALEMBIC_MIGRATE") == "1":
     from resources import RideBlueprint, UserBlueprint, VehicleBlueprint
     blueprints = [RideBlueprint, UserBlueprint, VehicleBlueprint]
-
+else:
+    blueprints=None
 
 def create_app(api_name="", db_url=None, blueprints=blueprints):
     load_dotenv()
