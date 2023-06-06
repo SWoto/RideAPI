@@ -20,9 +20,16 @@ class VehicleRegister(MethodView):
         if VehicleModel.find_by_license_plate(vehicle_data['license_plate']):
             abort(409, message="A vehicle with that license plate already exists")
 
-        if not UserModel.find_by_id(vehicle_data['user_id']):
+        owner = UserModel.find_by_id(vehicle_data['user_id'])
+        if not owner:
             abort(404, message="User not found")
 
+        # should never be more than one
+        active_vehicles = VehicleModel.get_user_active_vehicles(vehicle_data['user_id'])
+        for vehicle in active_vehicles:
+            vehicle.deactiate()
+
+        vehicle_data["active"] = True
         vehicle = VehicleModel(**vehicle_data)
         vehicle.save_to_db()
         return vehicle

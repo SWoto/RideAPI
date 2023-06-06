@@ -1,8 +1,9 @@
+import decimal
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from flask_jwt_extended import jwt_required
 
-from models import RideModel, UserModel
+from models import RideModel, UserModel, VehicleModel
 from schemas import RideSchema
 
 
@@ -16,13 +17,24 @@ class RideRegister(MethodView):
     def post(self, ride_data):
         driver = UserModel.find_driver_by_id(ride_data['driver_id'])
         user = UserModel.find_user_by_id(ride_data['user_id'])
+        active_vehicle = VehicleModel.get_user_active_vehicles(ride_data['driver_id'])
 
         if not driver:
             abort(404, message="Driver not found")
 
+        if not active_vehicle:
+            abort(404, message="Driver has no active vehicle")
+
+        if len(active_vehicle) > 1:
+            return abort(405,  message="Driver has more than one active vehicle")
+
         if not user:
             abort(404, message="User not found")
 
+        active_vehicle = active_vehicle[0]
+        price = ride_data['distance']/float(active_vehicle.consumption)*ride_data['gas_price']
+        
+        ride_data["total_value"] = price
         ride = RideModel(**ride_data)
         ride.save_to_db()
 

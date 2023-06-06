@@ -13,6 +13,7 @@ class VehicleTest(VehiclesBaseTest):
                     '/register', json=VehicleTest.vehicle_data_in, headers={'Authorization': 'Bearer {}'.format(jwt)})
                 result = json.loads(request.data)
                 data_out['id'] = result['id']
+                data_out['active'] = True
 
                 self.assertDictEqual(data_out, result)
 
@@ -48,6 +49,7 @@ class VehicleTest(VehiclesBaseTest):
                 result = json.loads(request.data)
                 result_id = result['id']
                 data_out['id'] = result_id
+                data_out['active'] = True
 
                 request = client.get("/vehicle/{}".format(result_id))
 
@@ -75,6 +77,7 @@ class VehicleTest(VehiclesBaseTest):
                         '/register', json=data_in_multi[i], headers={'Authorization': 'Bearer {}'.format(self.access_token)})
                     data_out_multi[i]['id'] = json.loads(request.data)[
                         'id']
+                    data_out_multi[i]['active'] = False if i < vehicles_cnt-1 else True
 
                 request = client.get(
                     '/vehicle', headers={'Authorization': 'Bearer {}'.format(self.access_token)})
