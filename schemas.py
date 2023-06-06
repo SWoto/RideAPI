@@ -61,7 +61,7 @@ class VehicleSchema(PlainVehicleSchema):
 
 
 class RideSchema(PlainRideSchema):
-    user_id = fields.String(required=True, load_only=True)
+    passanger_id = fields.String(required=True, load_only=True)
     driver_id = fields.String(required=True, load_only=True)
-    user = fields.Nested(PlainUserSchema(), dump_only=True)
+    passanger = fields.Nested(PlainUserSchema(), dump_only=True)
     driver = fields.Nested(PlainUserSchema(), dump_only=True)

@@ -16,7 +16,7 @@ class RideRegister(MethodView):
     @blp.response(201, RideSchema)
     def post(self, ride_data):
         driver = UserModel.find_driver_by_id(ride_data['driver_id'])
-        user = UserModel.find_user_by_id(ride_data['user_id'])
+        passanger = UserModel.find_passanger_by_id(ride_data['passanger_id'])
         active_vehicle = VehicleModel.get_user_active_vehicles(ride_data['driver_id'])
 
         if not driver:
@@ -28,8 +28,8 @@ class RideRegister(MethodView):
         if len(active_vehicle) > 1:
             return abort(405,  message="Driver has more than one active vehicle")
 
-        if not user:
-            abort(404, message="User not found")
+        if not passanger:
+            abort(404, message="Passanger not found")
 
         active_vehicle = active_vehicle[0]
         price = ride_data['distance']/float(active_vehicle.consumption)*ride_data['gas_price']

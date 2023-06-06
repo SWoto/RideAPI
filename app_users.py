@@ -20,10 +20,10 @@ if __name__ == "__main__":
 
     @app.before_first_request   
     def fill_roles():
-        role_user = {"name": "user"}
+        role_passanger = {"name": "passanger"}
         role_admin = {"name": "driver"}
-        if not UserRoleModel.find_by_name(**role_user):
-            db.session.add(UserRoleModel(**role_user))
+        if not UserRoleModel.find_by_name(**role_passanger):
+            db.session.add(UserRoleModel(**role_passanger))
         if not UserRoleModel.find_by_name(**role_admin):
             db.session.add(UserRoleModel(**role_admin))
         db.session.commit()

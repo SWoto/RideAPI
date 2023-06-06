@@ -81,7 +81,7 @@ class UserRides(MethodView):
 
         for role in UserRides.roles:
             if role_name == "user":
-                rides = RideModel.find_rides_user(user_id)
+                rides = RideModel.find_rides_passanger(user_id)
             elif role_name == "driver":
                 rides = RideModel.find_rides_driver(user_id)
             else:

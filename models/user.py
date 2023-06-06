@@ -16,8 +16,8 @@ class UserModel(BaseModel):
     role = db.relationship("UserRoleModel")
     vehicles = db.relationship(
         "VehicleModel", back_populates="user", lazy="dynamic")
-    rides_user = db.relationship("RideModel", foreign_keys="RideModel.user_id", viewonly=True)
-    rides_driver = db.relationship("RideModel", foreign_keys="RideModel.driver_id", viewonly=True)
+    #rides_passanger = db.relationship("RideModel", foreign_keys="RideModel.passanger_id", viewonly=True)
+    #rides_driver = db.relationship("RideModel", foreign_keys="RideModel.driver_id", viewonly=True)
     
 
 
@@ -38,5 +38,5 @@ class UserModel(BaseModel):
         return cls.__find_role_type_by_id(_id, "driver")
     
     @classmethod
-    def find_user_by_id(cls, _id):
-        return cls.__find_role_type_by_id(_id, "user")
+    def find_passanger_by_id(cls, _id):
+        return cls.__find_role_type_by_id(_id, "passanger")
