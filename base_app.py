@@ -7,7 +7,7 @@ from flask_jwt_extended import JWTManager
 from flask_smorest import Api, Blueprint
 from flask_migrate import Migrate
 
-from db import db, verify_init_sql
+from database.db import db, verify_init_sql
 from blocklist import jwt_redis_blocklist
 
 #Set it with powershell to run this command, then remove it
@@ -52,7 +52,7 @@ def create_app(api_name="", db_url=None, blueprints=blueprints):
         app.config["DEBUG"] = True
 
         db.init_app(app)
-        migrate = Migrate(app, db)
+        migrate = Migrate(app, db, directory=os.path.join("database","migrations"))
         api = Api(app)
 
         app.config['JWT_SECRET_KEY'] = os.getenv(

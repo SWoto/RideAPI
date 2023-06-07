@@ -1,6 +1,6 @@
 from passlib.hash import pbkdf2_sha256
 
-from db import db
+from database.db import db
 from models import BaseModel, UserRoleModel
 
 

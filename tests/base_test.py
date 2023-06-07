@@ -10,7 +10,7 @@ import os
 import unittest
 from flask_jwt_extended import create_access_token
 
-from db import db
+from database.db import db
 from sqlalchemy.sql import text
 from base_app import create_app
 from models import UserModel, UserRoleModel
