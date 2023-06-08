@@ -1,4 +1,4 @@
-from database.db import db
+from db import db
 from models import BaseModel, UserModel
 
 

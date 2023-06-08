@@ -1,6 +1,7 @@
 import unittest
 import uuid
-from schemas import VehicleSchema
+
+from src.schemas import VehicleSchema
 
 
 class VehicleSchemaTest(unittest.TestCase):

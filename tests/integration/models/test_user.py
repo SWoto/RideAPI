@@ -1,5 +1,5 @@
 from tests.base_test import UserBaseTest
-from models import UserModel
+from src.models import UserModel
 
 FAILED_TO_FIND_USER_WITH = "Did not find an user with {} '{}'"
 FAILED_DUPLICATED = "Duplicated - user {} was previusly added to the database"

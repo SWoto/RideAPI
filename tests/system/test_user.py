@@ -2,8 +2,8 @@ import json
 import uuid
 
 from tests.base_test import UserBaseTest
-from models import UserModel, UserRoleModel
-from schemas import UserRoleSchema
+from src.models import UserModel, UserRoleModel
+from src.schemas import UserRoleSchema
 
 
 class UserTest(UserBaseTest):

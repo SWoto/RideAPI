@@ -1,8 +1,8 @@
-import unittest
 import uuid
-
-from schemas import PlainVehicleSchema
+import unittest
 from marshmallow.exceptions import ValidationError
+
+from src.schemas import PlainVehicleSchema
 
 
 class VehiclePlainSchemaTest(unittest.TestCase):
@@ -47,8 +47,8 @@ class VehiclePlainSchemaTest(unittest.TestCase):
     def test_dump(self):
         data_in = VehiclePlainSchemaTest.data_in.copy()
         data_in["id"] = uuid.uuid4().hex
-        
+
         schema = PlainVehicleSchema()
-        
+
         self.assertEqual(data_in, schema.dump(
             data_in))

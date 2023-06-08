@@ -16,12 +16,10 @@ services:
     ports:
       - '5432:5432'
     env_file:
-      - .env
-    networks:
-      - postgres-network
+      - src/.env
     volumes:
-      - ./db-data/:/var/lib/postgresql/data/
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./database/db-data/:/var/lib/postgresql/data/
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   database-test:
     image: 'postgres:latest'
@@ -29,9 +27,7 @@ services:
     ports:
       - '5433:5432'
     env_file:
-      - .env
-    networks:
-      - postgres-network
+      - src/.env
       
   pgadmin:
     image: dpage/pgadmin4
@@ -39,17 +35,58 @@ services:
     ports:
       - '15433:80'
     env_file:
-      - .env
+      - src/.env
     depends_on:
       - database
-    networks:
-      - postgres-network
     volumes:
-      - ./pgadmin-data/:/var/lib/pgadmin/
+      - ./database/pgadmin-data/:/var/lib/pgadmin/
 
-networks: 
-  postgres-network:
-    driver: bridge
+  flask-users-api:
+    build:
+      context: src
+      dockerfile: users.Dockerfile
+    restart: always
+    depends_on:
+      - database
+      - cache
+    expose:
+      - 8000
+    command: gunicorn -w 3 -t 60 -b 0.0.0.0:8000 app:app
+
+  flask-vehicles-api:
+    build:
+      context: src
+      dockerfile: vehicles.Dockerfile
+    restart: always
+    depends_on:
+      - database
+      - cache
+    expose:
+      - 8001
+    command: gunicorn -w 3 -t 60 -b 0.0.0.0:8001 app:app
+
+  flask-rides-api:
+    build:
+      context: src
+      dockerfile: rides.Dockerfile
+    restart: always
+    depends_on:
+      - database
+      - cache
+    expose:
+      - 8002
+    command: gunicorn -w 3 -t 60 -b 0.0.0.0:8002 app:app
+
+  nginx:
+    build: ./nginx
+    ports:
+      - '8081:80'
+      - '8082:81'
+      - '8083:82'
+    depends_on:
+      - flask-users-api
+      - flask-vehicles-api
+      - flask-rides-api
 
 volumes:
   cache:

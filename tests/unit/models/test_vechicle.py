@@ -1,6 +1,6 @@
 import unittest
 
-from models import VehicleModel
+from src.models import VehicleModel
 
 
 FAILURE_CONTRUCT_ARGUMENT =  "The {} after creation does not equal the constructor argument."

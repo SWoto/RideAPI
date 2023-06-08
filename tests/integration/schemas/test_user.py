@@ -1,7 +1,7 @@
 import unittest
 import uuid
 
-from schemas import UserSchema
+from src.schemas import UserSchema
 
 
 class UserSchemaTest(unittest.TestCase):

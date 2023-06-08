@@ -1,6 +1,6 @@
 import unittest
 
-from schemas import PlainUserSchema
+from src.schemas import PlainUserSchema
 
 
 class UserPlainSchemaTest(unittest.TestCase):
@@ -21,5 +21,5 @@ class UserPlainSchemaTest(unittest.TestCase):
         data_out.pop("password")
 
         schema = PlainUserSchema()
-        
+
         self.assertEqual(data_out, schema.dump(data_in))

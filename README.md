@@ -31,6 +31,11 @@ docker compose -f .\docker-compose.yml create
 docker compose up
 ```
 
+In case of wanting to rebuild it all and get it running:
+```powershell
+
+```
+
 **Note**: It depends on the .env file and some of its parameters.
 - POSTGRES_USER=
 - POSTGRES_PASSWORD=
@@ -47,6 +52,8 @@ docker inspect <postgres_CONTAINER_ID>
 ```
 
 This will present its network settings and, in it, it's ip.
+
+Another option, as easier, is to user the postgres service name, same used in the docker-compose file.
 
 ## Migrate (Alembic)
 Always set the enviroment variable to use all the blueprints. **Remember to remove it latter.**

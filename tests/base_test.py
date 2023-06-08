@@ -10,16 +10,22 @@ import os
 import unittest
 from flask_jwt_extended import create_access_token
 
-from database.db import db
-from sqlalchemy.sql import text
-from base_app import create_app
-from models import UserModel, UserRoleModel
-from app_users import API_NAME as USER_API_NAME, BLUEPRINTS as USER_BLUEPRINTS
-from app_vehicles import API_NAME as VEHICLES_API_NAME, BLUEPRINTS as VEHICLES_BLUEPRINTS
+import os
+import sys
+PROJECT_PATH = os.getcwd()
+SOURCE_PATH = os.path.join(
+    PROJECT_PATH,"src"
+)
+sys.path.append(SOURCE_PATH)
+
+from src.base_app import create_app, db
+from src.models import UserModel, UserRoleModel
+from src.app_users import API_NAME as USER_API_NAME, BLUEPRINTS as USER_BLUEPRINTS
+from src.app_vehicles import API_NAME as VEHICLES_API_NAME, BLUEPRINTS as VEHICLES_BLUEPRINTS
 
 
 class BaseTest(unittest.TestCase):
-    SQLALCHEMY_DATABASE_URI = DATABASE_URL = "postgresql://{}:{}@127.0.0.1:5433/{}".format(
+    SQLALCHEMY_DATABASE_URI = "postgresql://{}:{}@127.0.0.1:5433/{}".format(
             os.getenv(
             "POSTGRES_USER"), os.getenv(
             "POSTGRES_PASSWORD"), os.getenv(
@@ -29,17 +35,14 @@ class BaseTest(unittest.TestCase):
     def setUpClass(cls):
         os.environ["UNITTEST"] = "1"
         cls._app = create_app(
-            cls.API_NAME, blueprints=cls.BLUEPRINTS, db_url=BaseTest.SQLALCHEMY_DATABASE_URI)
-
+            api_name=cls.API_NAME, blueprints=cls.BLUEPRINTS, db_url=cls.SQLALCHEMY_DATABASE_URI, test_mode=True)
         # with db.engine.connect() as conn:
         #     expected = [(1, 'test row 1', True), (2, 'test row 2', False)]
         #     result = conn.execute(text("SELECT * FROM public.test"))
 
-
     @classmethod
     def tearDownClass(cls):
         os.environ.pop("UNITTEST")
-        pass
 
     def setUp(self):
         with self._app.app_context():
@@ -51,6 +54,7 @@ class BaseTest(unittest.TestCase):
         with self._app.app_context():
             db.session.remove()
             db.drop_all()
+
 
 
 class UserBaseTest(BaseTest):

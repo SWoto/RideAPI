@@ -1,7 +1,7 @@
 import unittest
 import uuid
 
-from models import UserRoleModel
+from src.models import UserRoleModel
 
 class UserRoleTest(unittest.TestCase):
     def test_create_role(self):

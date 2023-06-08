@@ -1,6 +1,6 @@
 import uuid
 
-from database.db import db
+from db import db
 
 
 class BaseModel(db.Model):

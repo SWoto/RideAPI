@@ -1,7 +1,7 @@
 from passlib.hash import pbkdf2_sha256
 import uuid
 
-from models import UserModel
+from src.models import UserModel
 from tests.base_test import UserBaseTest
 
 FAILURE_CONTRUCT_ARGUMENT =  "The {} after creation does not equal the constructor argument."

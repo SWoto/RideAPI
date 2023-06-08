@@ -1,6 +1,6 @@
 from tests.base_test import UserRoleBaseTest
 
-from models import UserRoleModel
+from src.models import UserRoleModel
 
 FAILED_TO_FIND_USER_WITH = "Did not find a role with {} '{}'"
 FAILED_DUPLICATED = "Duplicated - role {} was previusly added to the database"

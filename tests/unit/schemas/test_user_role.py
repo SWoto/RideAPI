@@ -1,7 +1,7 @@
 import unittest
 import uuid
 
-from schemas import UserRoleSchema
+from src.schemas import UserRoleSchema
 
 
 class RoleSchemaTest(unittest.TestCase):

@@ -1,4 +1,5 @@
 import os
+import functools
 from dotenv import load_dotenv
 from datetime import timedelta
 
@@ -7,7 +8,9 @@ from flask_jwt_extended import JWTManager
 from flask_smorest import Api, Blueprint
 from flask_migrate import Migrate
 
-from database.db import db, verify_init_sql
+from db import db, verify_init_sql
+from models import UserRoleModel
+from models.user import db as db2
 from blocklist import jwt_redis_blocklist
 
 #Set it with powershell to run this command, then remove it
@@ -15,15 +18,34 @@ from blocklist import jwt_redis_blocklist
 # $env:ALEMBIC_MIGRATE="-1"
 # on the same terminal session, run flask --app base_app.py db init
 # flask --app base_app.py db migrate
+# blueprints are needed so the program can create the right tables
 if os.getenv("ALEMBIC_MIGRATE") == "1":
-    from resources import RideBlueprint, UserBlueprint, VehicleBlueprint
-    blueprints = [RideBlueprint, UserBlueprint, VehicleBlueprint]
+    from resources import RideBlueprint, UserBlueprint, VehicleBlueprint, BaseBlueprint
+    blueprints = [RideBlueprint, UserBlueprint, VehicleBlueprint, BaseBlueprint]
+    api_name=""
 else:
     blueprints=None
 
-def create_app(api_name="", db_url=None, blueprints=blueprints):
-    load_dotenv()
+load_dotenv()
 
+def declare_roles(func):
+    @functools.wraps(func)
+    def wrapper_decorator(*args, **kwargs):
+        app = func(*args, **kwargs)
+        if "Users" in kwargs.get('api_name','') and not kwargs.get('test_mode', False):
+            with app.app_context():
+                role_passanger = {"name": "passanger"}
+                role_admin = {"name": "driver"}
+                if not UserRoleModel.find_by_name(**role_passanger):
+                    db.session.add(UserRoleModel(**role_passanger))
+                if not UserRoleModel.find_by_name(**role_admin):
+                    db.session.add(UserRoleModel(**role_admin))
+                db.session.commit()
+        return app
+    return wrapper_decorator
+
+@declare_roles
+def create_app(api_name, db_url=None, blueprints=blueprints, test_mode=False):
     def create_subapp(db_url, api_name):
         app = Flask(__name__)
 
@@ -38,8 +60,13 @@ def create_app(api_name="", db_url=None, blueprints=blueprints):
         POSTGRES_DB = os.getenv(
             "POSTGRES_DB")
 
-        DATABASE_URL = "postgresql://{}:{}@127.0.0.1:5432/{}".format(
-            POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB)
+        #NOTE: database = same name as docker-compose.yml service for postgres
+        if os.getenv("DOCKER_CONTAINER", "-1") == "1":
+            db_ip = "database"
+        else:
+            db_ip = "127.0.0.1"
+        DATABASE_URL = "postgresql://{}:{}@{}:5432/{}".format(
+            POSTGRES_USER, POSTGRES_PASSWORD, db_ip, POSTGRES_DB)
         app.config["SQLALCHEMY_DATABASE_URI"] = db_url if db_url else DATABASE_URL
 
         app.config["API_TITLE"] = "{} - {}".format(
