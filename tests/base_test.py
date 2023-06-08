@@ -18,11 +18,12 @@ SOURCE_PATH = os.path.join(
 )
 sys.path.append(SOURCE_PATH)
 
+os.environ["UNITTEST"] = "1"
+
 from src.base_app import create_app, db
 from src.models import UserModel, UserRoleModel
 from src.app_users import API_NAME as USER_API_NAME, BLUEPRINTS as USER_BLUEPRINTS
 from src.app_vehicles import API_NAME as VEHICLES_API_NAME, BLUEPRINTS as VEHICLES_BLUEPRINTS
-
 
 class BaseTest(unittest.TestCase):
     SQLALCHEMY_DATABASE_URI = "postgresql://{}:{}@127.0.0.1:5433/{}".format(
@@ -33,7 +34,6 @@ class BaseTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        os.environ["UNITTEST"] = "1"
         print("setUpClass: ", BaseTest.SQLALCHEMY_DATABASE_URI)
         cls._app = create_app(
             api_name=cls.API_NAME, blueprints=cls.BLUEPRINTS, db_url=BaseTest.SQLALCHEMY_DATABASE_URI, test_mode=True)
@@ -43,8 +43,8 @@ class BaseTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        os.environ.pop("UNITTEST")
-
+       pass
+    
     def setUp(self):
         with self._app.app_context():
             db.create_all()
