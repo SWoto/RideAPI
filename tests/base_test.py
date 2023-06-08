@@ -34,6 +34,7 @@ class BaseTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         os.environ["UNITTEST"] = "1"
+        print("setUpClass: ", BaseTest.SQLALCHEMY_DATABASE_URI)
         cls._app = create_app(
             api_name=cls.API_NAME, blueprints=cls.BLUEPRINTS, db_url=BaseTest.SQLALCHEMY_DATABASE_URI, test_mode=True)
         # with db.engine.connect() as conn:

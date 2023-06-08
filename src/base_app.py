@@ -10,7 +10,6 @@ from flask_migrate import Migrate
 
 from db import db, verify_init_sql
 from models import UserRoleModel
-from models.user import db as db2
 from blocklist import jwt_redis_blocklist
 
 #Set it with powershell to run this command, then remove it
@@ -31,7 +30,9 @@ load_dotenv()
 def declare_roles(func):
     @functools.wraps(func)
     def wrapper_decorator(*args, **kwargs):
+        print("wrapper before app: ", kwargs.get('db_url'))
         app = func(*args, **kwargs)
+        print("wrapper after app: ", kwargs.get('db_url'))
         if "Users" in kwargs.get('api_name','') and not kwargs.get('test_mode', False):
             with app.app_context():
                 role_passanger = {"name": "passanger"}
@@ -47,6 +48,7 @@ def declare_roles(func):
 @declare_roles
 def create_app(api_name, db_url=None, blueprints=blueprints, test_mode=False):
     def create_subapp(db_url, api_name):
+        print("create_subapp: ", db_url)
         app = Flask(__name__)
 
         # All loading stuffs and configuration
@@ -122,6 +124,7 @@ def create_app(api_name, db_url=None, blueprints=blueprints, test_mode=False):
 
         return app, api
 
+    print("create_app: ", db_url)
     app, api = create_subapp(db_url, api_name)
     if blueprints:
         for blp in blueprints:

@@ -74,3 +74,8 @@ flask --app base_app db migrate -m "<some text>"
 ```
 flask --app base_app db upgrade
 ```
+
+## Unittest
+```
+python -m unittest discover -v -s tests -p "test_*.py"
+```
