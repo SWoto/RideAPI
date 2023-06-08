@@ -66,7 +66,7 @@ def create_app(api_name, db_url=None, blueprints=blueprints, test_mode=False):
         else:
             db_ip = "127.0.0.1"
 
-        POSTGRES_HOST = os.getenv("POSTGRES_PORT")
+        POSTGRES_HOST = os.getenv("POSTGRES_HOST")
         db_host = POSTGRES_HOST if POSTGRES_HOST else db_ip
         DATABASE_URL = "postgresql://{}:{}@{}:5432/{}".format(
             POSTGRES_USER, POSTGRES_PASSWORD, db_host, POSTGRES_DB)
