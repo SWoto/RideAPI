@@ -65,6 +65,5 @@ jobs:
         POSTGRES_USER: ${{ vars.POSTGRES_USER }}
         POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         POSTGRES_DB: ${{ vars.POSTGRES_DB }}
-        DOCKER_CONTAINER: 1
       run: |
         python -m unittest discover -v -s tests -p "test_*.py"
