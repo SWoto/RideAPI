@@ -35,7 +35,7 @@ class BaseTest(unittest.TestCase):
     def setUpClass(cls):
         os.environ["UNITTEST"] = "1"
         cls._app = create_app(
-            api_name=cls.API_NAME, blueprints=cls.BLUEPRINTS, db_url=cls.SQLALCHEMY_DATABASE_URI, test_mode=True)
+            api_name=cls.API_NAME, blueprints=cls.BLUEPRINTS, db_url=BaseTest.SQLALCHEMY_DATABASE_URI, test_mode=True)
         # with db.engine.connect() as conn:
         #     expected = [(1, 'test row 1', True), (2, 'test row 2', False)]
         #     result = conn.execute(text("SELECT * FROM public.test"))

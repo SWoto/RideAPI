@@ -60,10 +60,11 @@ jobs:
     - name: Test with unicode
       env:
         JWT_SECRET_KEY: ${{ secrets.FLASK_JWT_SECRET }}
-        POSTGRES_HOST: postgres
+        POSTGRES_HOST: database-test
         POSTGRES_PORT: 5433
         POSTGRES_USER: ${{ vars.POSTGRES_USER }}
         POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+        DOCKER_CONTAINER: 1
       run: |
         python -m unittest discover -v -s tests -p "test_*.py"

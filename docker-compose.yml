@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  cache:
+  redis:
     image: redis:7.0-alpine
     restart: always
     ports:
@@ -48,7 +48,7 @@ services:
     restart: always
     depends_on:
       - database
-      - cache
+      - redis
     expose:
       - 8000
     command: gunicorn -w 3 -t 60 -b 0.0.0.0:8000 app:app
@@ -60,7 +60,7 @@ services:
     restart: always
     depends_on:
       - database
-      - cache
+      - redis
     expose:
       - 8001
     command: gunicorn -w 3 -t 60 -b 0.0.0.0:8001 app:app
@@ -72,7 +72,7 @@ services:
     restart: always
     depends_on:
       - database
-      - cache
+      - redis
     expose:
       - 8002
     command: gunicorn -w 3 -t 60 -b 0.0.0.0:8002 app:app
