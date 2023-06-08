@@ -22,7 +22,7 @@ jobs:
         image: redis:7.0-alpine
         ports:
           - 6379:6379
-      database-test:
+      database:
         image: postgres:latest
         ports:
           - 5433:5432
@@ -60,7 +60,7 @@ jobs:
     - name: Test with unicode
       env:
         JWT_SECRET_KEY: ${{ secrets.FLASK_JWT_SECRET }}
-        POSTGRES_HOST: postgres
+        POSTGRES_HOST: database
         POSTGRES_PORT: 5433
         POSTGRES_USER: ${{ vars.POSTGRES_USER }}
         POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
