@@ -65,8 +65,11 @@ def create_app(api_name, db_url=None, blueprints=blueprints, test_mode=False):
             db_ip = "database"
         else:
             db_ip = "127.0.0.1"
+
+        POSTGRES_HOST = os.getenv("POSTGRES_PORT")
+        db_host = POSTGRES_HOST if POSTGRES_HOST else db_ip
         DATABASE_URL = "postgresql://{}:{}@{}:5432/{}".format(
-            POSTGRES_USER, POSTGRES_PASSWORD, db_ip, POSTGRES_DB)
+            POSTGRES_USER, POSTGRES_PASSWORD, db_host, POSTGRES_DB)
         app.config["SQLALCHEMY_DATABASE_URI"] = db_url if db_url else DATABASE_URL
 
         app.config["API_TITLE"] = "{} - {}".format(
