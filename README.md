@@ -1,4 +1,4 @@
-# RideAPI
+# RideAPI [![Python application](https://github.com/SWoto/RideAPI/actions/workflows/python-app.yml/badge.svg)](https://github.com/SWoto/RideAPI/actions/workflows/python-app.yml)
 The goal is to create an API that use microservices and message brokes to comunicate between them.
 
 # Project Description
