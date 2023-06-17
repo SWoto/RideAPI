@@ -1,5 +1,5 @@
 # RideAPI [![Python application](https://github.com/SWoto/RideAPI/actions/workflows/python-app.yml/badge.svg)](https://github.com/SWoto/RideAPI/actions/workflows/python-app.yml)
-The goal is to create an API that use microservices and message brokes to comunicate between them.
+The goal is to create an API that use microservices and message brokers to comunicate between them.
 
 # Project Description
 An API that handles rides. It will have:
@@ -27,13 +27,13 @@ Requests will connect passangers and drivers. Saving the distancy and informing 
 ## Docker
 This code uses postgres, [pgadmin](http://localhost:15433) and redis. All three of them can be set and run with the compose.yml file and two commands in the terminals.
 ```powershell
-docker compose -f .\docker-compose.yml create
+docker compose create
 docker compose up
 ```
 
 In case of wanting to rebuild it all and get it running:
 ```powershell
-
+ docker compose up -d --build  
 ```
 
 **Note**: It depends on the .env file and some of its parameters.
@@ -70,7 +70,7 @@ To update the db with new changes:
 ```
 flask --app base_app db migrate -m "<some text>"
 ```
-:exclamation: :exclamation: :exclamation: **ALWAYS CHECK THE GENERATED FILES, it might cause unwanted effects when upgrading or downgrading**
+:exclamation: **ALWAYS CHECK THE GENERATED FILES, it might cause unwanted effects when upgrading or downgrading**
 ```
 flask --app base_app db upgrade
 ```

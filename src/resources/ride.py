@@ -5,8 +5,9 @@ from flask_jwt_extended import jwt_required
 from models import RideModel, UserModel, VehicleModel
 from schemas import RideSchema
 
+blp = Blueprint("Rides", "rides",
+                description="Operation on rides. Connects drivers and users.")
 
-blp = Blueprint("Rides", "rides", description="Operation on rides. Connects drivers and users.")
 
 @blp.route("/register")
 class RideRegister(MethodView):
@@ -16,7 +17,8 @@ class RideRegister(MethodView):
     def post(self, ride_data):
         driver = UserModel.find_driver_by_id(ride_data['driver_id'])
         passanger = UserModel.find_passanger_by_id(ride_data['passanger_id'])
-        active_vehicle = VehicleModel.get_user_active_vehicles(ride_data['driver_id'])
+        active_vehicle = VehicleModel.get_user_active_vehicles(
+            ride_data['driver_id'])
 
         if not driver:
             abort(404, message="Driver not found")
@@ -31,12 +33,11 @@ class RideRegister(MethodView):
             abort(404, message="Passanger not found")
 
         active_vehicle = active_vehicle[0]
-        price = ride_data['distance']/float(active_vehicle.consumption)*ride_data['gas_price']
-        
+        price = ride_data['distance'] / \
+            float(active_vehicle.consumption)*ride_data['gas_price']
+
         ride_data["total_value"] = price
         ride = RideModel(**ride_data)
         ride.save_to_db()
 
-
         return ride
-
