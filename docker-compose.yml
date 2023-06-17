@@ -80,9 +80,7 @@ services:
   nginx:
     build: ./nginx
     ports:
-      - '8081:80'
-      - '8082:81'
-      - '8083:82'
+      - '80:80'
     depends_on:
       - flask-users-api
       - flask-vehicles-api
