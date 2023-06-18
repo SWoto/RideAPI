@@ -10,7 +10,7 @@ class VehicleTest(VehiclesBaseTest):
                 data_out = VehicleTest.vehicle_data_out.copy()
                 jwt = self.access_token
                 request = client.post(
-                    '/register', json=VehicleTest.vehicle_data_in, headers={'Authorization': 'Bearer {}'.format(jwt)})
+                    '/', json=VehicleTest.vehicle_data_in, headers={'Authorization': 'Bearer {}'.format(jwt)})
                 result = json.loads(request.data)
                 data_out['id'] = result['id']
                 data_out['active'] = True
@@ -18,7 +18,7 @@ class VehicleTest(VehiclesBaseTest):
                 self.assertDictEqual(data_out, result)
 
                 request = client.post(
-                    '/register', json=VehicleTest.vehicle_data_in)
+                    '/', json=VehicleTest.vehicle_data_in)
 
                 self.assertEqual(request.status_code, 401)
                 self.assertEqual(json.loads(request.text)[
@@ -29,10 +29,10 @@ class VehicleTest(VehiclesBaseTest):
             with self.app_context():
                 jwt = self.access_token
                 client.post(
-                    '/register', json=VehicleTest.vehicle_data_in, headers={'Authorization': 'Bearer {}'.format(jwt)})
+                    '/', json=VehicleTest.vehicle_data_in, headers={'Authorization': 'Bearer {}'.format(jwt)})
 
                 request = client.post(
-                    '/register', json=VehicleTest.vehicle_data_in, headers={'Authorization': 'Bearer {}'.format(jwt)})
+                    '/', json=VehicleTest.vehicle_data_in, headers={'Authorization': 'Bearer {}'.format(jwt)})
 
                 self.assertEqual(request.status_code, 409)
                 self.assertEqual(json.loads(request.text)[
@@ -44,14 +44,14 @@ class VehicleTest(VehiclesBaseTest):
                 data_out = VehicleTest.vehicle_data_out.copy()
 
                 request = client.post(
-                    '/register', json=VehicleTest.vehicle_data_in, headers={'Authorization': 'Bearer {}'.format(self.access_token)})
+                    '/', json=VehicleTest.vehicle_data_in, headers={'Authorization': 'Bearer {}'.format(self.access_token)})
 
                 result = json.loads(request.data)
                 result_id = result['id']
                 data_out['id'] = result_id
                 data_out['active'] = True
 
-                request = client.get("/vehicle/{}".format(result_id))
+                request = client.get("/{}".format(result_id))
 
                 self.assertDictEqual(data_out, result)
 
@@ -74,13 +74,13 @@ class VehicleTest(VehiclesBaseTest):
             with self.app_context():
                 for i in range(0, vehicles_cnt):
                     request = client.post(
-                        '/register', json=data_in_multi[i], headers={'Authorization': 'Bearer {}'.format(self.access_token)})
+                        '/', json=data_in_multi[i], headers={'Authorization': 'Bearer {}'.format(self.access_token)})
                     data_out_multi[i]['id'] = json.loads(request.data)[
                         'id']
                     data_out_multi[i]['active'] = False if i < vehicles_cnt-1 else True
 
                 request = client.get(
-                    '/vehicle', headers={'Authorization': 'Bearer {}'.format(self.access_token)})
+                    '/', headers={'Authorization': 'Bearer {}'.format(self.access_token)})
 
                 self.assertListEqual(
                     data_out_multi, json.loads(request.data))
@@ -89,16 +89,16 @@ class VehicleTest(VehiclesBaseTest):
         with self.app() as client:
             with self.app_context():
                 request = client.post(
-                    '/register', json=VehicleTest.vehicle_data_in, headers={'Authorization': 'Bearer {}'.format(self.access_token)})
+                    '/', json=VehicleTest.vehicle_data_in, headers={'Authorization': 'Bearer {}'.format(self.access_token)})
 
                 result_id = json.loads(request.data)['id']
-                request = client.delete("/vehicle/{}".format(result_id))
+                request = client.delete("/{}".format(result_id))
 
                 self.assertEqual(request.status_code, 401)
                 self.assertEqual(json.loads(request.text)[
                                  "msg"], "Missing Authorization Header")
 
-                request = client.delete("/vehicle/{}".format(result_id), headers={
+                request = client.delete("/{}".format(result_id), headers={
                                         'Authorization': 'Bearer {}'.format(self.access_token)})
 
                 self.assertEqual(request.status_code, 200)

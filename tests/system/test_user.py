@@ -15,7 +15,7 @@ class UserTest(UserBaseTest):
         with self.app() as client:
             with self.app_context():
 
-                request = client.post('/register', json=data_in)
+                request = client.post('/', json=data_in)
 
                 self.assertEqual(request.status_code, 201)
                 self.assertIsNotNone(UserModel.find_by_email('test@restapi.com'),
@@ -32,14 +32,14 @@ class UserTest(UserBaseTest):
 
         with self.app() as client:
             with self.app_context():
-                request = client.post('/register', json=data_in)
+                request = client.post('/', json=data_in)
 
                 received = json.loads(request.data)
                 received.pop('id')
 
                 self.assertDictEqual(data_out, received)
 
-                request = client.post('/register', json=data_in)
+                request = client.post('/', json=data_in)
 
                 self.assertEqual(request.status_code, 409)
                 self.assertEqual(
@@ -52,16 +52,16 @@ class UserTest(UserBaseTest):
         with self.app() as client:
             with self.app_context():
                 # test without registering
-                request = client.get('/user/{}'.format(uuid.uuid4().hex))
+                request = client.get('/{}'.format(uuid.uuid4().hex))
                 self.assertEqual(request.status_code, 404)
                 self.assertEqual(json.loads(request.data)[
                                  'status'], "Not Found")
 
                 # request to test again
-                request = client.post('/register', json=data_in)
+                request = client.post('/', json=data_in)
 
                 id = json.loads(request.data)['id']
-                request = client.get('/user/{}'.format(id))
+                request = client.get('/{}'.format(id))
 
                 data_out['id'] = id
                 self.assertEqual(request.status_code, 200,
@@ -77,12 +77,12 @@ class UserTest(UserBaseTest):
         with self.app() as client:
             with self.app_context():
                 # test without registering
-                request = client.delete('/user/{}'.format(uuid.uuid4().hex))
+                request = client.delete('/{}'.format(uuid.uuid4().hex))
                 self.assertEqual(request.status_code, 401)
                 self.assertEqual(json.loads(request.text)[
                                  "msg"], "Missing Authorization Header")
 
-                request = client.post('/register', json=data_in)
+                request = client.post('/', json=data_in)
                 id = json.loads(request.data)['id']
 
                 data_in_login_ok = {
@@ -92,7 +92,7 @@ class UserTest(UserBaseTest):
                 request = client.post('/login', json=data_in_login_ok)
                 jwt = json.loads(request.data)['access_token']
                 
-                request = client.delete('/user/{}'.format(id), headers={'Authorization': 'Bearer {}'.format(jwt)})
+                request = client.delete('/{}'.format(id), headers={'Authorization': 'Bearer {}'.format(jwt)})
 
                 data_expected['id'] = id
                 self.assertEqual(request.status_code, 200,
@@ -111,7 +111,7 @@ class UserTest(UserBaseTest):
         with self.app() as client:
             with self.app_context():
                 # test without registering
-                client.post('/register', json=data_in_register)
+                client.post('/', json=data_in_register)
 
                 request = client.post('/login', json=data_in_login_ok)
                 self.assertIn('access_token', json.loads(request.data).keys())
@@ -127,7 +127,7 @@ class UserTest(UserBaseTest):
         with self.app() as client:
             with self.app_context():
                 # test without registering
-                client.post('/register', json=data_in_register)
+                client.post('/', json=data_in_register)
 
                 request = client.post('/login', json=data_in_login_bad)
                 self.assertEqual(request.status_code, 401)
@@ -145,7 +145,7 @@ class UserTest(UserBaseTest):
         with self.app() as client:
             with self.app_context():
                 # test without registering
-                client.post('/register', json=data_in_register)
+                client.post('/', json=data_in_register)
 
                 request = client.post('/login', json=data_in_login)
                 jwt = json.loads(request.data)['access_token']
@@ -165,7 +165,7 @@ class UserTest(UserBaseTest):
 
         with self.app() as client:
             with self.app_context():
-                client.post('/register', json=data_in_register)
+                client.post('/', json=data_in_register)
 
                 request = client.post('/login', json=data_in_login)
                 jwt = json.loads(request.data)['access_token']
@@ -199,7 +199,7 @@ class UserTest(UserBaseTest):
             with self.app_context():
                 for i in range(0, users_cnt):
                     request = client.post(
-                        '/register', json=data_in_register_multi_users[i])
+                        '/', json=data_in_register_multi_users[i])
                     data_out_register_multi_users[i]['id'] = json.loads(request.data)[
                         'id']
 
@@ -212,7 +212,7 @@ class UserTest(UserBaseTest):
                 jwt = json.loads(request.data)['access_token']
 
                 request = client.get(
-                    '/user', headers={'Authorization': 'Bearer {}'.format(jwt)})
+                    '/', headers={'Authorization': 'Bearer {}'.format(jwt)})
 
                 self.assertListEqual(
                     data_out_register_multi_users, json.loads(request.data))
@@ -222,7 +222,7 @@ class UserTest(UserBaseTest):
             with self.app_context():
                 all_roles = UserRoleModel.query.all()
                 for role in all_roles:
-                    request = client.get('/user/role/{}'.format(role.id))
+                    request = client.get('/role/{}'.format(role.id))
                     self.assertDictEqual(UserRoleSchema().dump(role),
                                          json.loads(request.data))
 
@@ -230,7 +230,7 @@ class UserTest(UserBaseTest):
          with self.app() as client:
             with self.app_context():
                 all_roles = [UserRoleSchema().dump(role) for role in UserRoleModel.query.all()]
-                request = client.get('/user/role')
+                request = client.get('/role')
                 self.assertListEqual(all_roles, json.loads(request.data))
 
     
@@ -244,12 +244,12 @@ class UserTest(UserBaseTest):
 
         with self.app() as client:
             with self.app_context():
-                client.post('/register', json=data_in_register)
+                client.post('/', json=data_in_register)
 
                 request = client.post('/login', json=data_in_login)
                 jwt = json.loads(request.data)['access_token']
 
-                request = client.post('/user/role/register', json={'name':'test_register_role'}, headers={'Authorization': 'Bearer {}'.format(jwt)})
+                request = client.post('/role/register', json={'name':'test_register_role'}, headers={'Authorization': 'Bearer {}'.format(jwt)})
                 self.assertEqual("test_register_role", json.loads(request.data)['name'])
                 
 
