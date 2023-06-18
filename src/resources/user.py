@@ -15,7 +15,7 @@ blp = Blueprint("Users", "users",
                 description="Operation on users, be they drivers or passagens.")
 
 
-@blp.route("/register")
+@blp.route("/")
 class UserRegister(MethodView):
     @blp.arguments(UserSchema)
     @blp.response(201, UserSchema)
@@ -32,6 +32,29 @@ class UserRegister(MethodView):
 
         # return {"message": "User created succefully."}, 201
         return user
+
+
+@blp.route('/')
+class UserList(MethodView):
+    @jwt_required()
+    @blp.response(200, UserSchema(many=True))
+    def get(self):
+        return UserModel.query.all()
+
+
+@blp.route('/<string:user_id>')
+class User(MethodView):
+    @blp.response(200, UserSchema)
+    def get(self, user_id):
+        user = UserModel.query.get_or_404(user_id)
+        return user
+
+    @jwt_required()
+    def delete(self, user_id):
+        user = UserModel.query.get_or_404(user_id)
+        user.delete_from_db()
+
+        return {"message": "User deleted."}, 200
 
 
 @blp.route('/login')
@@ -56,32 +79,21 @@ class UserLogout(MethodView):
         jwt_redis_blocklist.set(jti, "", ex=access_expires)
         return {'message': 'Successfully logged out.'}
 
-@blp.route('/user/<string:user_id>')
-class User(MethodView):
-    @blp.response(200, UserSchema)
-    def get(self, user_id):
-        user = UserModel.query.get_or_404(user_id)
-        return user
 
-    @jwt_required()
-    def delete(self, user_id):
-        user = UserModel.query.get_or_404(user_id)
-        user.delete_from_db()
-
-        return {"message": "User deleted."}, 200
-
-#TODO: Add schema
-#TODO: Add test
-@blp.route('/user/<string:user_id>/rides/<string:role_name>')
+# TODO: Add schema
+# TODO: Add test
+@blp.route('/<string:user_id>/rides/<string:role_name>')
 class UserRides(MethodView):
-    roles = ["user", "driver"] #application may have more roles, like admin, support, so on. But only driver and passenger will have rides
+    # application may have more roles, like admin, support, so on. But only driver and passenger will have rides
+    roles = ["user", "driver"]
+
     def get(self, user_id, role_name):
         if role_name not in UserRides.roles:
             abort(404, message="Invalid role")
 
         for role in UserRides.roles:
             if role_name == "user":
-                rides = RideModel.find_rides_passanger(user_id)
+                rides = RideModel.find_rides_passenger(user_id)
             elif role_name == "driver":
                 rides = RideModel.find_rides_driver(user_id)
             else:
@@ -93,15 +105,7 @@ class UserRides(MethodView):
         return rides
 
 
-@blp.route('/user')
-class UserList(MethodView):
-    @jwt_required()
-    @blp.response(200, UserSchema(many=True))
-    def get(self):
-        return UserModel.query.all()
-
-
-@blp.route('/user/role/<string:role_id>')
+@blp.route('/role/<string:role_id>')
 class UserRole(MethodView):
     @blp.response(200, UserRoleSchema)
     def get(self, role_id):
@@ -109,14 +113,14 @@ class UserRole(MethodView):
         return role
 
 
-@blp.route('/user/role')
+@blp.route('/role')
 class UserRoleList(MethodView):
     @blp.response(200, UserRoleSchema(many=True))
     def get(self):
         return UserRoleModel.query.all()
 
 
-@blp.route('/user/role/register')
+@blp.route('/role/register')
 class UserRoleRegister(MethodView):
     @jwt_required()
     @blp.arguments(UserRoleSchema)
