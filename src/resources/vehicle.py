@@ -10,7 +10,7 @@ blp = Blueprint("Vehicles", "vehicles",
                 description="Operation os vehicles. Register them to users and rides.")
 
 
-@blp.route("/register")
+@blp.route("/")
 class VehicleRegister(MethodView):
 
     @jwt_required()
@@ -34,8 +34,16 @@ class VehicleRegister(MethodView):
         vehicle.save_to_db()
         return vehicle
 
+@blp.route("/")
+class VehicleList(MethodView):
 
-@blp.route("/vehicle/<string:vehicle_id>")
+    @jwt_required()
+    @blp.response(200, VehicleSchema(many=True))
+    def get(self):
+        print(VehicleModel.query.all())
+        return VehicleModel.query.all()
+
+@blp.route("/<string:vehicle_id>")
 class Vehicle(MethodView):
 
     @blp.response(200, VehicleSchema)
@@ -48,12 +56,3 @@ class Vehicle(MethodView):
         vehicle.delete_from_db()
         return {"message": "Vehicle deleted."}, 200
 
-
-@blp.route("/vehicle")
-class VehicleList(MethodView):
-
-    @jwt_required()
-    @blp.response(200, VehicleSchema(many=True))
-    def get(self):
-        print(VehicleModel.query.all())
-        return VehicleModel.query.all()
