@@ -1,4 +1,5 @@
-from marshmallow import Schema, fields, validates_schema, ValidationError, validates
+import json
+from marshmallow import Schema, fields, pre_load, ValidationError, validates, EXCLUDE
 import re
 
 
@@ -65,3 +66,21 @@ class RideSchema(PlainRideSchema):
     driver_id = fields.String(required=True, load_only=True)
     passenger = fields.Nested(PlainUserSchema(), dump_only=True)
     driver = fields.Nested(PlainUserSchema(), dump_only=True)
+
+class UserRidesQueryArgsSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+        
+    @pre_load
+    def remove_envelope(self, data_obj, **kwargs):
+        data = dict(data_obj)
+        pattern = r'^filter\[(.*?)\]$'
+        filtered_keys = [key for key in data.keys() if re.match(pattern, key)]
+        for key in filtered_keys:
+            tag_name = re.search(pattern, key).group(1)
+            data[tag_name] = data.get(key)
+
+        return data
+
+    user_id = fields.String(required=True, load_only=True)
+    role = fields.String(required=True, load_only=True)

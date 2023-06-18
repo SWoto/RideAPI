@@ -8,12 +8,13 @@ from flask_jwt_extended import create_access_token, get_jwt, jwt_required
 
 from blocklist import jwt_redis_blocklist
 from models import UserModel, UserRoleModel, RideModel
-from schemas import UserSchema, UserLoginSchema, UserRoleSchema
-
+from schemas import UserSchema, UserLoginSchema, UserRoleSchema, UserRidesQueryArgsSchema, PlainRideSchema
+from error.abort_error import BaseAbortError
 
 blp = Blueprint("Users", "users",
                 description="Operation on users, be they drivers or passagens.")
 
+UserRides_Get_role_not_implemented = BaseAbortError('501', '09497')
 
 @blp.route("/")
 class UserRegister(MethodView):
@@ -82,22 +83,28 @@ class UserLogout(MethodView):
 
 # TODO: Add schema
 # TODO: Add test
-@blp.route('/<string:user_id>/rides/<string:role_name>')
+@blp.route('/rides')
 class UserRides(MethodView):
     # application may have more roles, like admin, support, so on. But only driver and passenger will have rides
-    roles = ["user", "driver"]
+    roles = ["passanger", "driver"]
 
-    def get(self, user_id, role_name):
+    @blp.arguments(UserRidesQueryArgsSchema, location="query", as_kwargs=True)
+    @blp.response(200, PlainRideSchema(many=True))
+    def get(self, **kwargs):
+        print(kwargs)
+        user_id = kwargs['user_id']
+        role_name = kwargs['role']
         if role_name not in UserRides.roles:
             abort(404, message="Invalid role")
 
         for role in UserRides.roles:
-            if role_name == "user":
+            if role_name == "passanger":
                 rides = RideModel.find_rides_passenger(user_id)
             elif role_name == "driver":
                 rides = RideModel.find_rides_driver(user_id)
             else:
-                abort(501, message="Method not implemented for this role")
+                code, aditional_info = UserRides_Get_role_not_implemented.abort_parameters()
+                abort(code, **aditional_info)
 
         if not rides:
             abort(404, message="Rides not found for this user id and role")
