@@ -39,13 +39,13 @@ def upgrade():
     op.create_table('rides',
     sa.Column('distance', sa.Numeric(precision=5, scale=2), nullable=False),
     sa.Column('gas_price', sa.Numeric(precision=5, scale=2), nullable=False),
-    sa.Column('passanger_id', sa.String(length=32), nullable=False),
+    sa.Column('passenger_id', sa.String(length=32), nullable=False),
     sa.Column('driver_id', sa.String(length=32), nullable=False),
     sa.Column('total_value', sa.Numeric(precision=5, scale=2), nullable=False),
     sa.Column('id', sa.String(length=32), nullable=False),
     sa.Column('created_on', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['driver_id'], ['users.id'], ),
-    sa.ForeignKeyConstraint(['passanger_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['passenger_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('vehicles',

@@ -21,7 +21,7 @@ Users API will handle subscription and have two options, driver and passenger. T
 This will have the registered vehicles and its consuption (km/L) that is going to be used to calculate the rate. Each vehicle must be owned by one driver.
 
 ## Requests
-Requests will connect passangers and drivers. Saving the distancy and informing the user the total amount.
+Requests will connect passengers and drivers. Saving the distancy and informing the user the total amount.
 
 # How to use it
 ## Docker

@@ -21,7 +21,7 @@ class UserModel(BaseModel):
         cascade="all, delete",
         passive_deletes=True,
     )
-    # rides_passanger = db.relationship("RideModel", foreign_keys="RideModel.passanger_id", viewonly=True)
+    # rides_passenger = db.relationship("RideModel", foreign_keys="RideModel.passenger_id", viewonly=True)
     # rides_driver = db.relationship("RideModel", foreign_keys="RideModel.driver_id", viewonly=True)
 
     def __init__(self, **kwargs):
@@ -41,5 +41,5 @@ class UserModel(BaseModel):
         return cls.__find_role_type_by_id(_id, "driver")
 
     @classmethod
-    def find_passanger_by_id(cls, _id):
-        return cls.__find_role_type_by_id(_id, "passanger")
+    def find_passenger_by_id(cls, _id):
+        return cls.__find_role_type_by_id(_id, "passenger")

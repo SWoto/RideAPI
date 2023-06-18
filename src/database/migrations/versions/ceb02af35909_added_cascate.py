@@ -60,13 +60,13 @@ def downgrade():
     op.create_table('rides',
     sa.Column('distance', sa.NUMERIC(precision=5, scale=2), autoincrement=False, nullable=False),
     sa.Column('gas_price', sa.NUMERIC(precision=5, scale=2), autoincrement=False, nullable=False),
-    sa.Column('passanger_id', sa.VARCHAR(length=32), autoincrement=False, nullable=False),
+    sa.Column('passenger_id', sa.VARCHAR(length=32), autoincrement=False, nullable=False),
     sa.Column('driver_id', sa.VARCHAR(length=32), autoincrement=False, nullable=False),
     sa.Column('total_value', sa.NUMERIC(precision=5, scale=2), autoincrement=False, nullable=False),
     sa.Column('id', sa.VARCHAR(length=32), autoincrement=False, nullable=False),
     sa.Column('created_on', postgresql.TIMESTAMP(), autoincrement=False, nullable=True),
     sa.ForeignKeyConstraint(['driver_id'], ['users.id'], name='rides_driver_id_fkey'),
-    sa.ForeignKeyConstraint(['passanger_id'], ['users.id'], name='rides_passanger_id_fkey'),
+    sa.ForeignKeyConstraint(['passenger_id'], ['users.id'], name='rides_passenger_id_fkey'),
     sa.PrimaryKeyConstraint('id', name='rides_pkey')
     )
     # ### end Alembic commands ###

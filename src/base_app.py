@@ -35,10 +35,10 @@ def declare_roles(func):
         print("wrapper after app: ", kwargs.get('db_url'))
         if "Users" in kwargs.get('api_name','') and not kwargs.get('test_mode', False):
             with app.app_context():
-                role_passanger = {"name": "passanger"}
+                role_passenger = {"name": "passenger"}
                 role_admin = {"name": "driver"}
-                if not UserRoleModel.find_by_name(**role_passanger):
-                    db.session.add(UserRoleModel(**role_passanger))
+                if not UserRoleModel.find_by_name(**role_passenger):
+                    db.session.add(UserRoleModel(**role_passenger))
                 if not UserRoleModel.find_by_name(**role_admin):
                     db.session.add(UserRoleModel(**role_admin))
                 db.session.commit()
@@ -46,7 +46,7 @@ def declare_roles(func):
     return wrapper_decorator
 
 @declare_roles
-def create_app(api_name, db_url=None, blueprints=blueprints, test_mode=False):
+def create_app(api_name="", db_url=None, blueprints=blueprints, test_mode=False):
     def create_subapp(db_url, api_name):
         print("create_subapp: ", db_url)
         app = Flask(__name__)
