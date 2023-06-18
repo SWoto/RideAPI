@@ -21,7 +21,7 @@ class RideModel(BaseModel):
 
     @classmethod
     def find_rides_passenger(cls, passenger_id):
-        return cls.query.join(cls.user).filter(UserModel.id == passenger_id).all()
+        return cls.query.join(cls.passenger).filter(UserModel.id == passenger_id).all()
 
     @classmethod
     def find_rides_driver(cls, rider_id):
