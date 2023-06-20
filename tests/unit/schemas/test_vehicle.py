@@ -13,13 +13,6 @@ class VehiclePlainSchemaTest(unittest.TestCase):
         "model": "Onix",
     }
 
-    data_in_wrong = {
-        "consumption": -5,
-        "license_plate": "123",
-        "manufacturer": "Chevrolet",
-        "model": "Onix",
-    }
-
     def test_load(self):
         schema = PlainVehicleSchema()
         schema.load(VehiclePlainSchemaTest.data_in)
