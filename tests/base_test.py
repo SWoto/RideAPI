@@ -7,6 +7,7 @@ and makes sure that it is a new, blank database each time.
 """
 
 import os
+import random
 import unittest
 from flask_jwt_extended import create_access_token
 
@@ -22,6 +23,7 @@ os.environ["UNITTEST"] = "1"
 
 from src.base_app import create_app, db
 from src.models import UserModel, UserRoleModel
+from src.app_rides import API_NAME as RIDES_API_NAME, BLUEPRINTS as RIDES_BLUEPRINT
 from src.app_users import API_NAME as USER_API_NAME, BLUEPRINTS as USER_BLUEPRINTS
 from src.app_vehicles import API_NAME as VEHICLES_API_NAME, BLUEPRINTS as VEHICLES_BLUEPRINTS
 
@@ -76,6 +78,20 @@ class UserBaseTest(BaseTest):
         'vehicles': [],
     }
 
+    default_data_passenger = {
+        'username': 'test_passenger',
+        'email': 'passenger@restapi.com',
+        'password': 'test_secure',
+        'role_id': "",
+    }
+
+    default_data_driver = {
+        'username': 'test_driver',
+        'email': 'driver@restapi.com',
+        'password': 'test_secure',
+        'role_id': "",
+    }
+
     def setUp(self):
         super(UserBaseTest, self).setUp()
         with self.app_context():
@@ -91,6 +107,19 @@ class UserBaseTest(BaseTest):
         role_info['id'] = role.id
         cls.default_data_in['role_id'] = role.id
         cls.default_data_out['role'] = role_info.copy()
+
+
+    @classmethod
+    def set_passenger_rider(cls):
+        role_info = {"name": "passenger"}
+        role = UserRoleModel(**role_info)
+        role.save_to_db()
+        cls.default_data_passenger['role_id'] = role.id
+
+        role_info = {"name": "driver"}
+        role = UserRoleModel(**role_info)
+        role.save_to_db()
+        cls.default_data_driver['role_id'] = role.id
 
 
 
@@ -124,19 +153,27 @@ class VehiclesBaseTest(BaseTest):
     def setUp(self):
         super(VehiclesBaseTest, self).setUp()
         with self.app_context():
+            user_id = VehiclesBaseTest.set_vehicle()
+            self.access_token = create_access_token(
+                identity=user_id, fresh=True)
+
+    @classmethod
+    def set_vehicle(self, user=None):
+        if not user:
             UserBaseTest.set_role()
             user_data_in = UserBaseTest.default_data_in.copy()
 
             user = UserModel(**user_data_in)
             user.save_to_db()
-            
-            VehiclesBaseTest.vehicle_data_in["user_id"] = user.id
-            VehiclesBaseTest.vehicle_data_out["user"] = {
-                "username":user.username,
-                "email":user.email,
-                "id":user.id,
-            }
-            self.access_token = create_access_token(identity=user.id, fresh=True)
+
+        VehiclesBaseTest.vehicle_data_in["user_id"] = user.id
+        VehiclesBaseTest.vehicle_data_out["user"] = {
+            "username": user.username,
+            "email": user.email,
+            "id": user.id,
+        }
+
+        return user.id
 
 
 class UserRoleBaseTest(BaseTest):
@@ -147,3 +184,35 @@ class UserRoleBaseTest(BaseTest):
         'name': 'test_user_role',
     }
 
+
+class RideBaseTest(BaseTest):
+    API_NAME = RIDES_API_NAME
+    BLUEPRINTS = RIDES_BLUEPRINT
+
+    default_data_in = {
+        "distance": random.randint(1, 19999)/100,
+        "gas_price": random.randint(1, 4999)/100,
+        "total_value": random.randint(100, 99999)/100,
+        "passenger_id": "",
+        "driver_id": "",
+    }
+
+    def setUp(self):
+        super(RideBaseTest, self).setUp()
+        with self.app_context():
+            UserBaseTest.set_passenger_rider()
+            passenger_data_in = UserBaseTest.default_data_passenger.copy()
+            driver_data_in = UserBaseTest.default_data_driver.copy()
+
+            passenger = UserModel(**passenger_data_in)
+            passenger.save_to_db()
+            driver = UserModel(**driver_data_in)
+            driver.save_to_db()
+
+            _ = VehiclesBaseTest.set_vehicle(driver)
+
+            RideBaseTest.default_data_in["passenger_id"] = passenger.id
+            RideBaseTest.default_data_in["driver_id"] = driver.id
+
+            self.access_token = create_access_token(
+                identity=passenger.id, fresh=True)
