@@ -38,6 +38,18 @@ class PlainRideSchema(Schema):
     gas_price = fields.Float(required=True)
     total_value = fields.Float(dump_only=True)
 
+    @validates(field_name="distance")
+    def validate_distance(self, data):
+        if data <= 0 or data >= 200:
+            raise ValidationError(
+                "Invalid distance. Accepted range 0 < x < 200")
+        
+    @validates(field_name="gas_price")
+    def validate_gas_price(self, data):
+        if data <= 0 or data >= 50:
+            raise ValidationError(
+                "Invalid gas_price. Accepted range 0 < x < 50")
+
 
 class UserLoginSchema(Schema):
     email = fields.Str(required=True)
