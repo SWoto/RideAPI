@@ -9,7 +9,7 @@ blp = Blueprint("Rides", "rides",
                 description="Operation on rides. Connects drivers and users.")
 
 
-@blp.route("/register")
+@blp.route("/")
 class RideRegister(MethodView):
     @jwt_required()
     @blp.arguments(RideSchema)

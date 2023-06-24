@@ -15,21 +15,22 @@ import os
 import sys
 PROJECT_PATH = os.getcwd()
 SOURCE_PATH = os.path.join(
-    PROJECT_PATH,"src"
+    PROJECT_PATH, "src"
 )
 sys.path.append(SOURCE_PATH)
 
+from src.app_vehicles import API_NAME as VEHICLES_API_NAME, BLUEPRINTS as VEHICLES_BLUEPRINTS
+from src.app_users import API_NAME as USER_API_NAME, BLUEPRINTS as USER_BLUEPRINTS
+from src.app_rides import API_NAME as RIDES_API_NAME, BLUEPRINTS as RIDES_BLUEPRINT
+from src.models import UserModel, UserRoleModel, VehicleModel
+from src.base_app import create_app, db
+
 os.environ["UNITTEST"] = "1"
 
-from src.base_app import create_app, db
-from src.models import UserModel, UserRoleModel
-from src.app_rides import API_NAME as RIDES_API_NAME, BLUEPRINTS as RIDES_BLUEPRINT
-from src.app_users import API_NAME as USER_API_NAME, BLUEPRINTS as USER_BLUEPRINTS
-from src.app_vehicles import API_NAME as VEHICLES_API_NAME, BLUEPRINTS as VEHICLES_BLUEPRINTS
 
 class BaseTest(unittest.TestCase):
     SQLALCHEMY_DATABASE_URI = "postgresql://{}:{}@127.0.0.1:5433/{}".format(
-            os.getenv(
+        os.getenv(
             "POSTGRES_USER"), os.getenv(
             "POSTGRES_PASSWORD"), os.getenv(
             "POSTGRES_DB"))
@@ -45,8 +46,8 @@ class BaseTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-       pass
-    
+        pass
+
     def setUp(self):
         with self._app.app_context():
             db.create_all()
@@ -57,7 +58,6 @@ class BaseTest(unittest.TestCase):
         with self._app.app_context():
             db.session.remove()
             db.drop_all()
-
 
 
 class UserBaseTest(BaseTest):
@@ -97,17 +97,15 @@ class UserBaseTest(BaseTest):
         with self.app_context():
             UserBaseTest.set_role()
 
-
     @classmethod
     def set_role(cls):
-        role_info = {"name": "test_role"}   
+        role_info = {"name": "test_role"}
         role = UserRoleModel(**role_info)
         role.save_to_db()
 
         role_info['id'] = role.id
         cls.default_data_in['role_id'] = role.id
         cls.default_data_out['role'] = role_info.copy()
-
 
     @classmethod
     def set_passenger_rider(cls):
@@ -122,7 +120,6 @@ class UserBaseTest(BaseTest):
         cls.default_data_driver['role_id'] = role.id
 
 
-
 class VehiclesBaseTest(BaseTest):
     API_NAME = VEHICLES_API_NAME
     BLUEPRINTS = VEHICLES_BLUEPRINTS
@@ -132,23 +129,22 @@ class VehiclesBaseTest(BaseTest):
         "license_plate": "ABC0D12",
         "manufacturer": "Chevrolet",
         "model": "Onix",
-        "user_id":"",
+        "user_id": "",
     }
 
-    #note that ID is missing
+    # note that ID is missing
     vehicle_data_out = {
         "consumption": 11.55,
         "license_plate": "ABC0D12",
         "manufacturer": "Chevrolet",
         "model": "Onix",
-        "user":{},
+        "user": {},
     }
 
     data_user_login_ok = {
-            'email': 'test@restapi.com',
-            'password': 'test_secure',
-        }
-
+        'email': 'test@restapi.com',
+        'password': 'test_secure',
+    }
 
     def setUp(self):
         super(VehiclesBaseTest, self).setUp()
@@ -197,6 +193,10 @@ class RideBaseTest(BaseTest):
         "driver_id": "",
     }
 
+    default_data_out = {}
+
+    default_data_in_system = {}
+
     def setUp(self):
         super(RideBaseTest, self).setUp()
         with self.app_context():
@@ -211,8 +211,32 @@ class RideBaseTest(BaseTest):
 
             _ = VehiclesBaseTest.set_vehicle(driver)
 
+            vehicle = VehicleModel(**VehiclesBaseTest.vehicle_data_in, active=True)
+            vehicle.save_to_db()
+
             RideBaseTest.default_data_in["passenger_id"] = passenger.id
             RideBaseTest.default_data_in["driver_id"] = driver.id
 
             self.access_token = create_access_token(
                 identity=passenger.id, fresh=True)
+
+
+            RideBaseTest.default_data_in_system = RideBaseTest.default_data_in.copy()
+            RideBaseTest.default_data_in_system.pop('total_value')
+
+            RideBaseTest.default_data_out = RideBaseTest.default_data_in.copy()
+            RideBaseTest.default_data_out.pop('passenger_id')
+            RideBaseTest.default_data_out['passenger'] = {
+                'email':passenger.email,
+                'id':passenger.id,
+                'username':passenger.username
+            }
+            RideBaseTest.default_data_out.pop('driver_id')
+            RideBaseTest.default_data_out['driver'] = {
+                'email':driver.email,
+                'id':driver.id,
+                'username':driver.username
+            }
+            price = round(RideBaseTest.default_data_out['distance'] / \
+                VehiclesBaseTest.vehicle_data_in['consumption']*RideBaseTest.default_data_out['gas_price'],2)
+            RideBaseTest.default_data_out['total_value']=price
