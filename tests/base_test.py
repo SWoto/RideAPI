@@ -29,7 +29,7 @@ os.environ["UNITTEST"] = "1"
 
 
 class BaseTest(unittest.TestCase):
-    SQLALCHEMY_DATABASE_URI = "postgresql://{}:{}@127.0.0.1:5433/{}".format(
+    SQLALCHEMY_DATABASE_URI = "postgresql://{}:{}@database-test:5433/{}".format(
         os.getenv(
             "POSTGRES_USER"), os.getenv(
             "POSTGRES_PASSWORD"), os.getenv(
