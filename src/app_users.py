@@ -6,8 +6,7 @@ from resources import BaseBlueprint, UserBlueprint
 API_NAME = "Users MS."
 BLUEPRINTS = [BaseBlueprint, UserBlueprint]
 
-
-if not os.getenv("UNITTEST"):
+if os.getenv("UNITTEST", "-1") != "1":
     app = create_app(api_name=API_NAME, blueprints=BLUEPRINTS)
 
 if __name__ == "__main__":

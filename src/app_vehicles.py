@@ -6,7 +6,7 @@ from resources import BaseBlueprint, VehicleBlueprint
 API_NAME = "Vehicles MS."
 BLUEPRINTS = [BaseBlueprint, VehicleBlueprint]
 
-if not os.getenv("UNITTEST"):
+if os.getenv("UNITTEST", "-1") != "1":
     app = create_app(api_name=API_NAME, blueprints=BLUEPRINTS)
 
 if __name__ == "__main__":

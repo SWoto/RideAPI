@@ -19,21 +19,21 @@ SOURCE_PATH = os.path.join(
 )
 sys.path.append(SOURCE_PATH)
 
+os.environ["UNITTEST"] = "1"
+
 from src.app_vehicles import API_NAME as VEHICLES_API_NAME, BLUEPRINTS as VEHICLES_BLUEPRINTS
 from src.app_users import API_NAME as USER_API_NAME, BLUEPRINTS as USER_BLUEPRINTS
 from src.app_rides import API_NAME as RIDES_API_NAME, BLUEPRINTS as RIDES_BLUEPRINT
 from src.models import UserModel, UserRoleModel, VehicleModel
 from src.base_app import create_app, db
 
-os.environ["UNITTEST"] = "1"
-
 
 class BaseTest(unittest.TestCase):
     SQLALCHEMY_DATABASE_URI = "postgresql://{}:{}@{}:{}/{}".format(
             os.getenv("POSTGRES_USER"), 
             os.getenv("POSTGRES_PASSWORD"),
-            os.getenv("POSTGRES_HOST", "127.0.0.1"),
-            os.getenv("POSTGRES_PORT", "5433"), 
+            os.getenv("POSTGRES_TEST_HOST", "127.0.0.1"),
+            os.getenv("POSTGRES_TEST_PORT", "5433"), 
             os.getenv("POSTGRES_DB"),
         )
 
@@ -200,6 +200,7 @@ class RideBaseTest(BaseTest):
     default_data_in_system = {}
 
     def setUp(self):
+        print(BaseTest.SQLALCHEMY_DATABASE_URI)
         super(RideBaseTest, self).setUp()
         with self.app_context():
             UserBaseTest.set_passenger_rider()

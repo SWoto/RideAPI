@@ -20,7 +20,7 @@ COPY --chown=nonroot:nonroot app_users.py app.py
 
 # venv
 ENV VIRTUAL_ENV=/home/app/venv
-ENV DOCKER_CONTAINER="1"
+
 
 # python setup
 RUN python -m venv $VIRTUAL_ENV
