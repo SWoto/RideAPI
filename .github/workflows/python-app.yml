@@ -5,7 +5,7 @@ name: Python application
 
 on:
   push:
-    branches: [ "main", "fixes_github_actions" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
