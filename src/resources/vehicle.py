@@ -40,8 +40,13 @@ class VehicleList(MethodView):
     @jwt_required()
     @blp.response(200, VehicleSchema(many=True))
     def get(self):
-        print(VehicleModel.query.all())
-        return VehicleModel.query.all()
+        #print(VehicleModel.query.all())
+        vehicles = VehicleModel.query.all()
+
+        if not vehicles:
+            abort(404)
+
+        return vehicles
 
 @blp.route("/<string:vehicle_id>")
 class Vehicle(MethodView):

@@ -10,7 +10,7 @@
 			"name": "User API",
 			"item": [
 				{
-					"name": "Register User - /register",
+					"name": "Register Passenger - /user",
 					"event": [
 						{
 							"listen": "test",
@@ -23,6 +23,15 @@
 								],
 								"type": "text/javascript"
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let randPassword = pm.variables.replaceIn(\"{{$rand_password}}\")"
+								],
+								"type": "text/javascript"
+							}
 						}
 					],
 					"request": {
@@ -30,7 +39,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"test_user\",\r\n    \"email\": \"test_2@restapi.com\",\r\n    \"password\": \"{{password}}\",\r\n    \"role_id\": \"{{driver_role_id}}\"\r\n}",
+							"raw": "{\r\n    \"username\": \"{{$randomUserName}}\",\r\n    \"email\": \"{{$randomEmail}}\",\r\n    \"password\": \"{{rand_password}}\",\r\n    \"role_id\": \"{{passenger_role_id}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -38,13 +47,61 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}:{{user_port}}/register",
+							"raw": "{{url}}/user",
 							"host": [
 								"{{url}}"
 							],
-							"port": "{{user_port}}",
 							"path": [
-								"register"
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Driver- /user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var data = pm.response.json();\r",
+									"\r",
+									"pm.environment.set(data[\"role\"][\"name\"]+\"_id\", data.id);\r",
+									"pm.environment.set(\"email\", data.email);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let randPassword = pm.variables.replaceIn(\"{{$rand_password}}\")"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"{{$randomUserName}}\",\r\n    \"email\": \"{{$randomEmail}}\",\r\n    \"password\": \"{{rand_password}}\",\r\n    \"role_id\": \"{{driver_role_id}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/user",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user"
 							]
 						}
 					},
@@ -52,6 +109,46 @@
 				},
 				{
 					"name": "Get User - /user/user_id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"test_user\",\r\n    \"email\": \"test@restapi.com\",\r\n    \"password\": \"test_secure\",\r\n    \"role\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/user/{{passenger_id}}",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"user",
+								"{{passenger_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Rides- /user/rides",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -68,14 +165,23 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}:{{user_port}}/user/{{user_id}}",
+							"raw": "{{url}}/user/rides?filter[user_id]={{passenger_id}}&filter[role]=driver",
 							"host": [
 								"{{url}}"
 							],
-							"port": "{{user_port}}",
 							"path": [
 								"user",
-								"{{user_id}}"
+								"rides"
+							],
+							"query": [
+								{
+									"key": "filter[user_id]",
+									"value": "{{passenger_id}}"
+								},
+								{
+									"key": "filter[role]",
+									"value": "driver"
+								}
 							]
 						}
 					},
@@ -109,11 +215,10 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}:{{user_port}}/user",
+							"raw": "{{url}}/user",
 							"host": [
 								"{{url}}"
 							],
-							"port": "{{user_port}}",
 							"path": [
 								"user"
 							]
@@ -164,11 +269,10 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}:{{user_port}}/user/role",
+							"raw": "{{url}}/user/role",
 							"host": [
 								"{{url}}"
 							],
-							"port": "{{user_port}}",
 							"path": [
 								"user",
 								"role"
@@ -180,6 +284,16 @@
 				{
 					"name": "Delete User - /user/user_id",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "DELETE",
 						"header": [],
 						"body": {
@@ -192,14 +306,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}:{{user_port}}/user/{{user_id}}",
+							"raw": "{{url}}/user/{{passenger_id}}",
 							"host": [
 								"{{url}}"
 							],
-							"port": "{{user_port}}",
 							"path": [
 								"user",
-								"{{user_id}}"
+								"{{passenger_id}}"
 							]
 						}
 					},
@@ -225,7 +338,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+							"raw": "{\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{rand_password}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -233,12 +346,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}:{{user_port}}/login",
+							"raw": "{{url}}/user/login",
 							"host": [
 								"{{url}}"
 							],
-							"port": "{{user_port}}",
 							"path": [
+								"user",
 								"login"
 							]
 						}
@@ -281,12 +394,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}:{{user_port}}/logout",
+							"raw": "{{url}}/user/logout",
 							"host": [
 								"{{url}}"
 							],
-							"port": "{{user_port}}",
 							"path": [
+								"user",
 								"logout"
 							]
 						}
@@ -299,8 +412,18 @@
 			"name": "Vehicles API",
 			"item": [
 				{
-					"name": "Register Vechicle - /register",
+					"name": "Register Vehicle - /register",
 					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"consumption\", _.random(4, 50, true).toFixed(2))\r",
+									"pm.environment.set(\"end_plate\", _.random(10, 99, true).toFixed(0)) "
+								],
+								"type": "text/javascript"
+							}
+						},
 						{
 							"listen": "test",
 							"script": {
@@ -327,7 +450,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"manufacturer\": \"Chevrolet\",\r\n    \"model\": \"Onix\",\r\n    \"license_plate\": \"LSN8I49\",\r\n    \"consumption\": 11.55,\r\n    \"user_id\":\"{{user_id}}\"\r\n}",
+							"raw": "{\r\n    \"manufacturer\": \"Chevrolet\",\r\n    \"model\": \"Onix\",\r\n    \"license_plate\": \"LSN8I{{end_plate}}\",\r\n    \"consumption\": {{consumption}},\r\n    \"user_id\":\"{{driver_id}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -335,62 +458,10 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}:{{vehicle_port}}/register",
+							"raw": "{{url}}/vehicle",
 							"host": [
 								"{{url}}"
 							],
-							"port": "{{vehicle_port}}",
-							"path": [
-								"register"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get all Vechicles - /vehicle",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									""
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{access_token}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "GET",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{url}}:{{vehicle_port}}/vehicle",
-							"host": [
-								"{{url}}"
-							],
-							"port": "{{vehicle_port}}",
 							"path": [
 								"vehicle"
 							]
@@ -399,7 +470,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Vechicles - /vehicle/vehicle_id",
+					"name": "Get all Vehicle - /vehicle",
 					"event": [
 						{
 							"listen": "test",
@@ -437,11 +508,60 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}:{{vehicle_port}}/vehicle/{{vehicle_id}}",
+							"raw": "{{url}}/vehicle",
 							"host": [
 								"{{url}}"
 							],
-							"port": "{{vehicle_port}}",
+							"path": [
+								"vehicle"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Vehicle - /vehicle/vehicle_id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/vehicle/{{vehicle_id}}",
+							"host": [
+								"{{url}}"
+							],
 							"path": [
 								"vehicle",
 								"{{vehicle_id}}"
@@ -451,7 +571,7 @@
 					"response": []
 				},
 				{
-					"name": "Delete Vechicle - /vehicle/vehicle_id",
+					"name": "Delete Vehicle - /vehicle/vehicle_id",
 					"event": [
 						{
 							"listen": "test",
@@ -486,11 +606,10 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}:{{vehicle_port}}/vehicle/{{vehicle_id}}",
+							"raw": "{{url}}/vehicle/{{vehicle_id}}",
 							"host": [
 								"{{url}}"
 							],
-							"port": "{{vehicle_port}}",
 							"path": [
 								"vehicle",
 								"{{vehicle_id}}"
@@ -516,6 +635,16 @@
 								],
 								"type": "text/javascript"
 							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"distance\", _.random(1, 250, true).toFixed(2))\r",
+									"pm.environment.set(\"gas_price\", _.random(2, 10, true).toFixed(2))"
+								],
+								"type": "text/javascript"
+							}
 						}
 					],
 					"request": {
@@ -533,7 +662,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"distance\": 35,\r\n    \"gas_price\": 5.99,\r\n    \"user_id\": \"asdasdasdasd\",\r\n    \"driver_id\": \"{{driver_id}}\"\r\n}",
+							"raw": "{\r\n    \"distance\": {{distance}},\r\n    \"gas_price\": {{gas_price}},\r\n    \"passenger_id\": \"{{passenger_id}}\",\r\n    \"driver_id\": \"{{driver_id}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -541,13 +670,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}:{{rides_port}}/register",
+							"raw": "{{url}}/ride",
 							"host": [
 								"{{url}}"
 							],
-							"port": "{{rides_port}}",
 							"path": [
-								"register"
+								"ride"
 							]
 						}
 					},
