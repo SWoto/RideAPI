@@ -43,6 +43,8 @@ In case of wanting to rebuild it all and get it running:
 - PGADMIN_DEFAULT_EMAIL=
 - PGADMIN_DEFAULT_PASSWORD=
 
+If you've just cloned the repository, there will be no .env file, though note that there is a .env.example. Use it as a basis to set-up your configuraiton.
+
 ## pgAdmin
 On the first run, to set up pgadmin, you'll need the parameters mentioned just before and also the container ip-address.
 
@@ -74,6 +76,10 @@ flask --app base_app db migrate -m "<some text>"
 ```
 flask --app base_app db upgrade
 ```
+
+### Disclaimer
+Given that the database is running locally and not in a server, everytime that this program is built in a new computer, 
+the database must be initiated again. Due to this, the ´src/database/migrations/versions´ will be added to the .gitignore file.
 
 ## Unittest
 ```

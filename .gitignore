@@ -164,5 +164,7 @@ cython_debug/
 pgadmin-data/
 db-data/
 
+src/database/migrations/versions/
+
 
 TODO.md
