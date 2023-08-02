@@ -251,7 +251,3 @@ class UserTest(UserBaseTest):
 
                 request = client.post('/role/register', json={'name':'test_register_role'}, headers={'Authorization': 'Bearer {}'.format(jwt)})
                 self.assertEqual("test_register_role", json.loads(request.data)['name'])
-                
-
-
-

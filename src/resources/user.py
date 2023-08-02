@@ -14,7 +14,7 @@ from error.abort_error import BaseAbortError
 blp = Blueprint("Users", "users",
                 description="Operation on users, be they drivers or passagens.")
 
-UserRides_Get_role_not_implemented = BaseAbortError('501', '09497')
+UserRides_Get_role_not_implemented = BaseAbortError(501, '09497')
 
 @blp.route("/")
 class UserRegister(MethodView):
@@ -85,26 +85,23 @@ class UserLogout(MethodView):
 # TODO: Add test
 @blp.route('/rides')
 class UserRides(MethodView):
-    # application may have more roles, like admin, support, so on. But only driver and passenger will have rides
-    roles = ["passanger", "driver"]
-
     @blp.arguments(UserRidesQueryArgsSchema, location="query", as_kwargs=True)
     @blp.response(200, PlainRideSchema(many=True))
     def get(self, **kwargs):
         print(kwargs)
         user_id = kwargs['user_id']
         role_name = kwargs['role']
-        if role_name not in UserRides.roles:
-            abort(404, message="Invalid role")
 
-        for role in UserRides.roles:
-            if role_name == "passanger":
-                rides = RideModel.find_rides_passenger(user_id)
-            elif role_name == "driver":
-                rides = RideModel.find_rides_driver(user_id)
-            else:
-                code, aditional_info = UserRides_Get_role_not_implemented.abort_parameters()
-                abort(code, **aditional_info)
+        # application may have more roles, like admin, support, so on. But only driver and passenger will have rides
+        if role_name == "passenger":
+            rides = RideModel.find_rides_passenger(user_id)
+        elif role_name == "driver":
+            rides = RideModel.find_rides_driver(user_id)
+        else:
+            #TODO: Improve this, internal_code is not currently being broadcasted.
+            code, aditional_info = UserRides_Get_role_not_implemented.abort_parameters()
+            print(aditional_info)
+            abort(code, **aditional_info)
 
         if not rides:
             abort(404, message="Rides not found for this user id and role")
